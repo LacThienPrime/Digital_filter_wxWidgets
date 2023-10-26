@@ -29,11 +29,7 @@
         <property name="use_array_enum">0</property>
         <property name="use_enum">0</property>
         <property name="use_microsoft_bom">0</property>
-<<<<<<< HEAD
         <object class="Frame" expanded="1">
-=======
-        <object class="Frame" expanded="0">
->>>>>>> 0a03b58ebc67b86781da17136f3e8130bbdc9136
             <property name="aui_managed">0</property>
             <property name="aui_manager_style">wxAUI_MGR_DEFAULT</property>
             <property name="bg">wxSYS_COLOUR_BTNFACE</property>
@@ -48,11 +44,7 @@
             <property name="hidden">0</property>
             <property name="id">wxID_ANY</property>
             <property name="maximum_size"></property>
-<<<<<<< HEAD
             <property name="minimum_size">900,620</property>
-=======
-            <property name="minimum_size"></property>
->>>>>>> 0a03b58ebc67b86781da17136f3e8130bbdc9136
             <property name="name">MyFrameUI</property>
             <property name="pos"></property>
             <property name="size">900,620</property>
@@ -65,7 +57,6 @@
             <property name="window_name"></property>
             <property name="window_style">wxTAB_TRAVERSAL</property>
             <property name="xrc_skip_sizer">1</property>
-<<<<<<< HEAD
             <object class="wxGridBagSizer" expanded="1">
                 <property name="empty_cell_size"></property>
                 <property name="flexible_direction">wxVERTICAL</property>
@@ -78,61 +69,31 @@
                 <property name="permission">none</property>
                 <property name="vgap">0</property>
                 <object class="gbsizeritem" expanded="1">
-=======
-            <object class="wxGridBagSizer" expanded="0">
-                <property name="empty_cell_size"></property>
-                <property name="flexible_direction">wxBOTH</property>
-                <property name="growablecols">2,3,4,5,6,7</property>
-                <property name="growablerows">0,1,2,3</property>
-                <property name="hgap">0</property>
-                <property name="minimum_size"></property>
-                <property name="name">gbSizer1</property>
-                <property name="non_flexible_grow_mode">wxFLEX_GROWMODE_ALL</property>
-                <property name="permission">none</property>
-                <property name="vgap">0</property>
-                <object class="gbsizeritem" expanded="0">
->>>>>>> 0a03b58ebc67b86781da17136f3e8130bbdc9136
                     <property name="border">5</property>
                     <property name="colspan">2</property>
                     <property name="column">0</property>
                     <property name="flag">wxALL|wxEXPAND</property>
                     <property name="row">0</property>
                     <property name="rowspan">4</property>
-<<<<<<< HEAD
                     <object class="wxGridBagSizer" expanded="1">
-=======
-                    <object class="wxGridBagSizer" expanded="0">
->>>>>>> 0a03b58ebc67b86781da17136f3e8130bbdc9136
                         <property name="empty_cell_size"></property>
                         <property name="flexible_direction">wxBOTH</property>
                         <property name="growablecols"></property>
                         <property name="growablerows">0,1,2,3,4,5,6,7,8,9</property>
                         <property name="hgap">0</property>
                         <property name="minimum_size">270,-1</property>
-<<<<<<< HEAD
                         <property name="name">controlSizer</property>
                         <property name="non_flexible_grow_mode">wxFLEX_GROWMODE_SPECIFIED</property>
                         <property name="permission">none</property>
                         <property name="vgap">0</property>
                         <object class="gbsizeritem" expanded="1">
-=======
-                        <property name="name">gbSizer2</property>
-                        <property name="non_flexible_grow_mode">wxFLEX_GROWMODE_SPECIFIED</property>
-                        <property name="permission">none</property>
-                        <property name="vgap">0</property>
-                        <object class="gbsizeritem" expanded="0">
->>>>>>> 0a03b58ebc67b86781da17136f3e8130bbdc9136
                             <property name="border">5</property>
                             <property name="colspan">2</property>
                             <property name="column">0</property>
                             <property name="flag">wxEXPAND | wxALL</property>
                             <property name="row">0</property>
                             <property name="rowspan">10</property>
-<<<<<<< HEAD
                             <object class="wxPanel" expanded="1">
-=======
-                            <object class="wxPanel" expanded="0">
->>>>>>> 0a03b58ebc67b86781da17136f3e8130bbdc9136
                                 <property name="BottomDockable">1</property>
                                 <property name="LeftDockable">1</property>
                                 <property name="RightDockable">1</property>
@@ -167,11 +128,7 @@
                                 <property name="minimize_button">0</property>
                                 <property name="minimum_size">270,520</property>
                                 <property name="moveable">1</property>
-<<<<<<< HEAD
                                 <property name="name">controlPanel</property>
-=======
-                                <property name="name">m_panel1</property>
->>>>>>> 0a03b58ebc67b86781da17136f3e8130bbdc9136
                                 <property name="pane_border">1</property>
                                 <property name="pane_position"></property>
                                 <property name="pane_size"></property>
@@ -187,11 +144,7 @@
                                 <property name="window_extra_style"></property>
                                 <property name="window_name"></property>
                                 <property name="window_style">wxTAB_TRAVERSAL</property>
-<<<<<<< HEAD
                                 <object class="wxGridBagSizer" expanded="1">
-=======
-                                <object class="wxGridBagSizer" expanded="0">
->>>>>>> 0a03b58ebc67b86781da17136f3e8130bbdc9136
                                     <property name="empty_cell_size"></property>
                                     <property name="flexible_direction">wxVERTICAL</property>
                                     <property name="growablecols"></property>
@@ -202,22 +155,14 @@
                                     <property name="non_flexible_grow_mode">wxFLEX_GROWMODE_SPECIFIED</property>
                                     <property name="permission">none</property>
                                     <property name="vgap">0</property>
-<<<<<<< HEAD
                                     <object class="gbsizeritem" expanded="1">
-=======
-                                    <object class="gbsizeritem" expanded="0">
->>>>>>> 0a03b58ebc67b86781da17136f3e8130bbdc9136
                                         <property name="border">5</property>
                                         <property name="colspan">2</property>
                                         <property name="column">0</property>
                                         <property name="flag">wxALIGN_CENTER|wxALL</property>
                                         <property name="row">0</property>
                                         <property name="rowspan">6</property>
-<<<<<<< HEAD
                                         <object class="wxStaticBoxSizer" expanded="1">
-=======
-                                        <object class="wxStaticBoxSizer" expanded="0">
->>>>>>> 0a03b58ebc67b86781da17136f3e8130bbdc9136
                                             <property name="id">wxID_ANY</property>
                                             <property name="label">FIR SPECIFY FREQUENCY</property>
                                             <property name="minimum_size"></property>
@@ -225,19 +170,11 @@
                                             <property name="orient">wxVERTICAL</property>
                                             <property name="parent">1</property>
                                             <property name="permission">none</property>
-<<<<<<< HEAD
                                             <object class="sizeritem" expanded="1">
                                                 <property name="border">5</property>
                                                 <property name="flag">wxEXPAND</property>
                                                 <property name="proportion">1</property>
                                                 <object class="wxGridSizer" expanded="1">
-=======
-                                            <object class="sizeritem" expanded="0">
-                                                <property name="border">5</property>
-                                                <property name="flag">wxEXPAND</property>
-                                                <property name="proportion">1</property>
-                                                <object class="wxGridSizer" expanded="0">
->>>>>>> 0a03b58ebc67b86781da17136f3e8130bbdc9136
                                                     <property name="cols">2</property>
                                                     <property name="hgap">0</property>
                                                     <property name="minimum_size"></property>
@@ -824,11 +761,7 @@
                                                             <property name="caption"></property>
                                                             <property name="caption_visible">1</property>
                                                             <property name="center_pane">0</property>
-<<<<<<< HEAD
                                                             <property name="choices">&quot;Rectangular&quot; &quot;Triangular&quot; &quot;Welch&quot; &quot;Sine&quot; &quot;Hann&quot; &quot;Hamming&quot; &quot;Blackman&quot; &quot;Nuttall&quot; &quot;BlackmanNuttall&quot; &quot;BlackmanHarris&quot; &quot;FlatTop&quot;</property>
-=======
-                                                            <property name="choices">&quot;Rectangular&quot; &quot;Triangular&quot; &quot;Welch&quot; &quot;Sine&quot; &quot;Hamming&quot; &quot;Blackman&quot; &quot;Nuttall&quot; &quot;BlackmanNuttall&quot; &quot;BlackmanHarris&quot; &quot;FlatTop&quot;</property>
->>>>>>> 0a03b58ebc67b86781da17136f3e8130bbdc9136
                                                             <property name="close_button">1</property>
                                                             <property name="context_help"></property>
                                                             <property name="context_menu">1</property>
@@ -878,22 +811,14 @@
                                             </object>
                                         </object>
                                     </object>
-<<<<<<< HEAD
                                     <object class="gbsizeritem" expanded="1">
-=======
-                                    <object class="gbsizeritem" expanded="0">
->>>>>>> 0a03b58ebc67b86781da17136f3e8130bbdc9136
                                         <property name="border">5</property>
                                         <property name="colspan">2</property>
                                         <property name="column">0</property>
                                         <property name="flag">wxALIGN_CENTER|wxALL</property>
                                         <property name="row">7</property>
                                         <property name="rowspan">6</property>
-<<<<<<< HEAD
                                         <object class="wxStaticBoxSizer" expanded="1">
-=======
-                                        <object class="wxStaticBoxSizer" expanded="0">
->>>>>>> 0a03b58ebc67b86781da17136f3e8130bbdc9136
                                             <property name="id">wxID_ANY</property>
                                             <property name="label">IIR SPECIFY FREQUENCY</property>
                                             <property name="minimum_size"></property>
@@ -901,19 +826,11 @@
                                             <property name="orient">wxVERTICAL</property>
                                             <property name="parent">1</property>
                                             <property name="permission">none</property>
-<<<<<<< HEAD
                                             <object class="sizeritem" expanded="1">
                                                 <property name="border">5</property>
                                                 <property name="flag">wxEXPAND</property>
                                                 <property name="proportion">1</property>
                                                 <object class="wxGridSizer" expanded="1">
-=======
-                                            <object class="sizeritem" expanded="0">
-                                                <property name="border">5</property>
-                                                <property name="flag">wxEXPAND</property>
-                                                <property name="proportion">1</property>
-                                                <object class="wxGridSizer" expanded="0">
->>>>>>> 0a03b58ebc67b86781da17136f3e8130bbdc9136
                                                     <property name="cols">2</property>
                                                     <property name="hgap">0</property>
                                                     <property name="minimum_size"></property>
@@ -1425,22 +1342,14 @@
                                             </object>
                                         </object>
                                     </object>
-<<<<<<< HEAD
                                     <object class="gbsizeritem" expanded="1">
-=======
-                                    <object class="gbsizeritem" expanded="0">
->>>>>>> 0a03b58ebc67b86781da17136f3e8130bbdc9136
                                         <property name="border">5</property>
                                         <property name="colspan">2</property>
                                         <property name="column">0</property>
                                         <property name="flag">wxALIGN_LEFT|wxALL</property>
                                         <property name="row">14</property>
                                         <property name="rowspan">6</property>
-<<<<<<< HEAD
                                         <object class="wxStaticBoxSizer" expanded="1">
-=======
-                                        <object class="wxStaticBoxSizer" expanded="0">
->>>>>>> 0a03b58ebc67b86781da17136f3e8130bbdc9136
                                             <property name="id">wxID_ANY</property>
                                             <property name="label">RESPONSE TYPE</property>
                                             <property name="minimum_size"></property>
@@ -1448,19 +1357,11 @@
                                             <property name="orient">wxVERTICAL</property>
                                             <property name="parent">1</property>
                                             <property name="permission">none</property>
-<<<<<<< HEAD
                                             <object class="sizeritem" expanded="1">
                                                 <property name="border">5</property>
                                                 <property name="flag">wxALIGN_CENTER|wxALL</property>
                                                 <property name="proportion">1</property>
                                                 <object class="wxGridSizer" expanded="1">
-=======
-                                            <object class="sizeritem" expanded="0">
-                                                <property name="border">5</property>
-                                                <property name="flag">wxALIGN_CENTER|wxALL</property>
-                                                <property name="proportion">1</property>
-                                                <object class="wxGridSizer" expanded="0">
->>>>>>> 0a03b58ebc67b86781da17136f3e8130bbdc9136
                                                     <property name="cols">2</property>
                                                     <property name="hgap">60</property>
                                                     <property name="minimum_size"></property>
@@ -1731,33 +1632,21 @@
                                 </object>
                             </object>
                         </object>
-<<<<<<< HEAD
                         <object class="gbsizeritem" expanded="1">
-=======
-                        <object class="gbsizeritem" expanded="0">
->>>>>>> 0a03b58ebc67b86781da17136f3e8130bbdc9136
                             <property name="border">5</property>
                             <property name="colspan">2</property>
                             <property name="column">0</property>
                             <property name="flag">wxALIGN_CENTER</property>
                             <property name="row">10</property>
                             <property name="rowspan">1</property>
-<<<<<<< HEAD
                             <object class="wxGridSizer" expanded="1">
-=======
-                            <object class="wxGridSizer" expanded="0">
->>>>>>> 0a03b58ebc67b86781da17136f3e8130bbdc9136
                                 <property name="cols">2</property>
                                 <property name="hgap">20</property>
                                 <property name="minimum_size">100,30</property>
                                 <property name="name">gSizer12</property>
                                 <property name="permission">none</property>
                                 <property name="rows">1</property>
-<<<<<<< HEAD
                                 <property name="vgap">10</property>
-=======
-                                <property name="vgap">20</property>
->>>>>>> 0a03b58ebc67b86781da17136f3e8130bbdc9136
                                 <object class="sizeritem" expanded="0">
                                     <property name="border">5</property>
                                     <property name="flag">wxALIGN_CENTER|wxALL</property>
@@ -1910,18 +1799,13 @@
                         </object>
                     </object>
                 </object>
-<<<<<<< HEAD
                 <object class="gbsizeritem" expanded="1">
-=======
-                <object class="gbsizeritem" expanded="0">
->>>>>>> 0a03b58ebc67b86781da17136f3e8130bbdc9136
                     <property name="border">5</property>
                     <property name="colspan">6</property>
                     <property name="column">2</property>
                     <property name="flag">wxEXPAND</property>
                     <property name="row">0</property>
                     <property name="rowspan">4</property>
-<<<<<<< HEAD
                     <object class="wxGridSizer" expanded="1">
                         <property name="cols">1</property>
                         <property name="hgap">0</property>
@@ -2056,16 +1940,6 @@
                                 </object>
                             </object>
                         </object>
-=======
-                    <object class="wxGridSizer" expanded="0">
-                        <property name="cols">1</property>
-                        <property name="hgap">0</property>
-                        <property name="minimum_size"></property>
-                        <property name="name">gSizer_plot</property>
-                        <property name="permission">none</property>
-                        <property name="rows">2</property>
-                        <property name="vgap">0</property>
->>>>>>> 0a03b58ebc67b86781da17136f3e8130bbdc9136
                     </object>
                 </object>
             </object>
