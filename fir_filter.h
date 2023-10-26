@@ -1,0 +1,68 @@
+#pragma once
+
+#include <wx/wx.h>
+
+#include <vector>
+#include <thread>
+#include <tuple>
+#include <vector>
+#include <thread>
+#include <chrono>
+#include <complex>
+#include <stdint.h>
+#include <math.h>
+#include <cmath>
+
+<<<<<<< HEAD
+class FIRfilter
+=======
+#include "mathplot.h"
+
+class FIRfilter : public mpFXYVector
+>>>>>>> 0a03b58ebc67b86781da17136f3e8130bbdc9136
+{
+public:
+    enum class WindowType
+    {
+        Rectangular,
+        Triangular,
+        Welch,
+        Sine,
+        Hann,
+        Hamming,
+        Blackman,
+        Nuttall,
+        BlackmanNuttall,
+        BlackmanHarris,
+        FlatTop
+    };
+
+    enum class FilterType
+    {
+        LowPass,
+        HighPass,
+        BandPass,
+        BandStop
+    };
+
+    WindowType WIN_TYPE;
+    FilterType FILT_TYPE;
+
+    std::vector<double> ComputeResponses(int sample, int order, int shift_sample, int cutoff_freq_low, int cutoff_freq_high);
+    std::vector<double> ComputeWindow(int order);
+    std::vector<double> ComputeWindowedResponses(int sample, std::vector<double> impulseResponse, std::vector<double> window, int order);
+
+    std::tuple<std::vector<double>, std::vector<double>> CalcFIRFilter(std::vector<double> coef, std::vector<double> input);
+
+<<<<<<< HEAD
+    void GetCoefFIR(int sample, std::vector<double> impulseResponse, std::vector<double> window, int order);
+    void GetFIRFilter(std::vector<double> coef, std::vector<double> input);
+};
+=======
+    //double FIRFilterUpdate(std::vector<double> coef, double input);
+    void GetCoefFIR(int sample, std::vector<double> impulseResponse, std::vector<double> window, int order);
+    void GetFIRFilter(std::vector<double> coef, std::vector<double> input);
+};
+
+
+>>>>>>> 0a03b58ebc67b86781da17136f3e8130bbdc9136
