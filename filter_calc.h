@@ -6,7 +6,6 @@
 #include <tuple>
 #include <vector>
 #include <complex>
-<<<<<<< HEAD
 #include <string>
 
 class FilterCalc : public wxWindow
@@ -21,29 +20,9 @@ public:
     std::vector<double> b;
 
 private:
-    void OnPaint(wxPaintEvent& evt);
+    void OnPaintSignal(wxPaintEvent& evt);
 
     int sample_freq;
     wxCriticalSection& valuesCs;
     std::tuple<int, double, double> CalSegment(double low, double high); 
-=======
-
-#include "mathplot.h"
-
-class FilterCalc : public mpFXYVector
-{
-public:
-    std::tuple<std::vector<double>, std::vector<double>> CalcTestSignal(int sample);
-
-    void GetTestSignal(int sample);
-
-    std::tuple<std::vector<double>, std::vector<double>> CalcFilteredSignal(std::tuple<std::vector<double>, std::vector<double>> test_signal,
-        std::vector<double> a, std::vector<double> b);
-
-    void GetFilteredSignal(std::tuple<std::vector<double>, std::vector<double>> test_signal,
-        std::vector<double> a, std::vector<double> b);
-
-    void CalcDFT(std::vector<double> time, std::vector<double> signal);
->>>>>>> 0a03b58ebc67b86781da17136f3e8130bbdc9136
 };
-

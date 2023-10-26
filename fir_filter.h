@@ -13,13 +13,7 @@
 #include <math.h>
 #include <cmath>
 
-<<<<<<< HEAD
-class FIRfilter
-=======
-#include "mathplot.h"
-
-class FIRfilter : public mpFXYVector
->>>>>>> 0a03b58ebc67b86781da17136f3e8130bbdc9136
+class FIRfilter : public wxWindow
 {
 public:
     enum class WindowType
@@ -54,15 +48,6 @@ public:
 
     std::tuple<std::vector<double>, std::vector<double>> CalcFIRFilter(std::vector<double> coef, std::vector<double> input);
 
-<<<<<<< HEAD
     void GetCoefFIR(int sample, std::vector<double> impulseResponse, std::vector<double> window, int order);
     void GetFIRFilter(std::vector<double> coef, std::vector<double> input);
 };
-=======
-    //double FIRFilterUpdate(std::vector<double> coef, double input);
-    void GetCoefFIR(int sample, std::vector<double> impulseResponse, std::vector<double> window, int order);
-    void GetFIRFilter(std::vector<double> coef, std::vector<double> input);
-};
-
-
->>>>>>> 0a03b58ebc67b86781da17136f3e8130bbdc9136

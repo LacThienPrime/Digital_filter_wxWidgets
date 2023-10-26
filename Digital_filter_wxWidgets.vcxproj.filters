@@ -24,20 +24,10 @@
     <ClCompile Include="my_frame_UI.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-<<<<<<< HEAD
     <ClCompile Include="filter_calc.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="coef_strategy.cpp">
-=======
-    <ClCompile Include="coef_strategy.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="mathplot.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="filter_calc.cpp">
->>>>>>> 0a03b58ebc67b86781da17136f3e8130bbdc9136
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="fir_filter.cpp">
@@ -54,20 +44,10 @@
     <ClInclude Include="my_frame_UI.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-<<<<<<< HEAD
     <ClInclude Include="filter_calc.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="coef_strategy.h">
-=======
-    <ClInclude Include="coef_strategy.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="mathplot.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="filter_calc.h">
->>>>>>> 0a03b58ebc67b86781da17136f3e8130bbdc9136
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="fir_filter.h">

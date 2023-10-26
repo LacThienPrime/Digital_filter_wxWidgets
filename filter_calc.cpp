@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 #include <wx/settings.h>
 #include <wx/graphics.h>
 #include <wx/dcbuffer.h>
@@ -10,10 +9,10 @@ FilterCalc::FilterCalc(wxWindow* parent, wxWindowID id, const wxPoint& pos, cons
 {
 	this->SetBackgroundStyle(wxBG_STYLE_PAINT);
 
-	this->Bind(wxEVT_PAINT, &FilterCalc::OnPaint, this);
+	this->Bind(wxEVT_PAINT, &FilterCalc::OnPaintSignal, this);
 }
 
-void FilterCalc::OnPaint(wxPaintEvent& evt)
+void FilterCalc::OnPaintSignal(wxPaintEvent& evt)
 {
 	wxAutoBufferedPaintDC dc(this);
 	dc.Clear();
@@ -175,115 +174,3 @@ std::tuple<int, double, double> FilterCalc::CalSegment(double origLow, double or
 
 	return std::make_tuple(10, origLow, origHigh);
 }
-=======
-#include "filter_calc.h"
-
-//! [get values of test signal]
-std::tuple<std::vector<double>, std::vector<double>> FilterCalc::CalcTestSignal(int sample)
-{
-    std::vector<double> tt, yy;
-
-    double dt = 1.0 / sample;
-    double y;
-
-    for (double t = 0.0; t <= 1.0; t = t + dt)
-    {
-        y = sin(2 * M_PI * 5.0 * t) + 0.6 * sin(2 * M_PI * 50.0 * t) + 0.8 * sin(2 * M_PI * 80.0 * t);
-
-        tt.push_back(t);
-        yy.push_back(y);
-    }
-
-    return make_tuple(tt, yy);
-}
-
-void FilterCalc::GetTestSignal(int sample)
-{
-    std::vector<double> tt = std::get<0>(CalcTestSignal(sample));
-    std::vector<double> yy = std::get<1>(CalcTestSignal(sample));
-
-    this->SetData(tt, yy);
-}
-//! [get values of test signal]
-
-//! [get values of filtered signal]
-std::tuple<std::vector<double>, std::vector<double>> FilterCalc::CalcFilteredSignal
-(
-    std::tuple<std::vector<double>, std::vector<double>> test_signal, std::vector<double> a, std::vector<double> b
-)
-{
-    std::vector<double> tt = std::get<0>(test_signal);
-    std::vector<double> yy = std::get<1>(test_signal);
-
-    std::vector<double> yy_filtered(yy.size(), 0.0);
-
-    for (int i = 3; i < yy.size(); i++)
-    {
-        yy_filtered[i] = a[1] * yy_filtered[i - 1] + a[2] * yy_filtered[i - 2]
-            + b[0] * yy[i] + b[1] * yy[i - 1] + b[2] * yy[i - 2];
-    }
-
-    return make_tuple(tt, yy_filtered);
-}
-
-void FilterCalc::GetFilteredSignal(std::tuple<std::vector<double>, std::vector<double>> test_signal, std::vector<double> a, std::vector<double> b)
-{
-    std::vector<double> tt = std::get<0>(test_signal);
-    std::vector<double> yy = std::get<1>(test_signal);
-
-    std::vector<double> yy_filtered(yy.size(), 0.0);
-
-    yy_filtered = std::get<1>(CalcFilteredSignal(test_signal, a, b));
-
-    this->SetData(tt, yy_filtered);
-}
-//! [get values of filtered signal]
-
-//! [calculate DFT]
-void FilterCalc::CalcDFT(std::vector<double> time, std::vector<double> signal)
-{
-    int N = signal.size();
-    int K = N;
-
-    std::complex<double> intSum;
-
-    std::vector<std::complex<double>> output;
-    output.reserve(K);
-
-    for (int k = 0; k < K; k++)
-    {
-        intSum = std::complex<double>(0.0, 0.0);
-
-        for (int n = 0; n < N; n++)
-        {
-            double realPart = cos((2 * M_PI / N) * k * n);
-            double imagPart = sin((2 * M_PI / N) * k * n);
-
-            std::complex<double> w(realPart, -imagPart);
-
-            intSum += signal[n] * w;
-        }
-
-        output.push_back(intSum);
-    }
-
-    int j = time.size();
-
-    std::vector<double> xx;
-    std::vector<double> yy;
-
-    for (int n = 0; n < j; n++)
-    {
-        xx.push_back(n);
-    }
-
-    for (auto& ii : output)
-    {
-        ii = ii / static_cast<double>(j);
-        yy.push_back(std::abs(ii));
-    }
-
-    this->SetData(xx, yy);
-}
-//! [calculate DFT]
->>>>>>> 0a03b58ebc67b86781da17136f3e8130bbdc9136

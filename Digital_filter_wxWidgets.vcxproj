@@ -151,10 +151,6 @@
     <ClCompile Include="coef_strategy.cpp" />
     <ClCompile Include="filter_calc.cpp" />
     <ClCompile Include="fir_filter.cpp" />
-<<<<<<< HEAD
-=======
-    <ClCompile Include="mathplot.cpp" />
->>>>>>> 0a03b58ebc67b86781da17136f3e8130bbdc9136
     <ClCompile Include="my_frame.cpp" />
     <ClCompile Include="my_frame_UI.cpp" />
   </ItemGroup>
@@ -163,10 +159,6 @@
     <ClInclude Include="coef_strategy.h" />
     <ClInclude Include="filter_calc.h" />
     <ClInclude Include="fir_filter.h" />
-<<<<<<< HEAD
-=======
-    <ClInclude Include="mathplot.h" />
->>>>>>> 0a03b58ebc67b86781da17136f3e8130bbdc9136
     <ClInclude Include="my_frame.h" />
     <ClInclude Include="my_frame_UI.h" />
   </ItemGroup>

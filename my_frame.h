@@ -2,7 +2,6 @@
 
 #include <wx/wx.h>
 
-<<<<<<< HEAD
 #include "coef_strategy.h"
 #include "fir_filter.h"
 #include "filter_calc.h"
@@ -13,22 +12,12 @@ wxDECLARE_EVENT(wxEVT_SORTINGTHREAD_CANCELLED, wxThreadEvent);
 wxDECLARE_EVENT(wxEVT_SORTINGTHREAD_UPDATED, wxThreadEvent);
 
 class MyFrame : public MyFrameUI, public wxThreadHelper
-=======
-#include "filter_calc.h"
-#include "coef_strategy.h"
-#include "fir_filter.h"
-#include "my_frame_UI.h"
-
-class MyFrame : public MyFrameUI
->>>>>>> 0a03b58ebc67b86781da17136f3e8130bbdc9136
 {
 public:
 	MyFrame();
 	//virtual ~MyFrame();
 
 private:
-<<<<<<< HEAD
-<<<<<<< HEAD
     bool processing{ false };
 
     wxCriticalSection dataCs;
@@ -42,20 +31,9 @@ private:
     void OnClose(wxCloseEvent& e);
 	void OnStartIIRClicked(wxCommandEvent& e);
     //void OnStartFIRClicked(wxCommandEvent& e);
-=======
-    void OnStartIIRClicked(wxCommandEvent& e);
-    void OnStartFIRClicked(wxCommandEvent& e);
->>>>>>> 0a03b58ebc67b86781da17136f3e8130bbdc9136
     void GetInputValue();
     void SelectResponse();
 
-=======
-    void OnStartIIRClicked(wxCommandEvent& e);
-    void OnStartFIRClicked(wxCommandEvent& e);
-    void GetInputValue();
-    void SelectResponse();
-   
->>>>>>> 0a03b58ebc67b86781da17136f3e8130bbdc9136
     int sample_freq;
     int pass_freq;
     int stop_freq;
@@ -75,28 +53,8 @@ private:
     std::vector<double> fir_coef;
     std::vector<double> fir_time;
     std::vector<double> fir_signal;
-<<<<<<< HEAD
    
     FilterCalc* testSignal;
     FilterCalc* dft;
-=======
-
-    mpScaleX* timeAxis;
-    mpScaleY* amplitudeAxis;
-    mpScaleX* freqAxis;
-    mpScaleY* magnitudeAxis;
-
-    mpWindow* filterPlot;
-    mpWindow* DFTPlot;
-
-    FilterCalc* testSignal;
-    FilterCalc* filteredSignal;
-
-    FilterCalc* signalDFT;
-    FilterCalc* filterDFT;
-
-    FIRfilter* fir;
-    FIRfilter* coef;
->>>>>>> 0a03b58ebc67b86781da17136f3e8130bbdc9136
 };
 

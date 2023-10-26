@@ -6,21 +6,15 @@ enum IDs
     ID_BTN_FIR_START
 };
 
-<<<<<<< HEAD
 wxDEFINE_EVENT(wxEVT_SORTINGTHREAD_COMPLETED, wxThreadEvent);
 wxDEFINE_EVENT(wxEVT_SORTINGTHREAD_CANCELLED, wxThreadEvent);
 wxDEFINE_EVENT(wxEVT_SORTINGTHREAD_UPDATED, wxThreadEvent);
 
 MyFrame::MyFrame() : MyFrameUI(nullptr, wxID_ANY, "Digital Filter C++", wxDefaultPosition, wxSize(900, 650))
-=======
-MyFrame::MyFrame()
-    : MyFrameUI(nullptr, wxID_ANY, "Digital Filter C++", wxDefaultPosition, wxSize(900, 650))
->>>>>>> 0a03b58ebc67b86781da17136f3e8130bbdc9136
 {
     Connect(ID_BTN_IIR_START, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MyFrame::OnStartIIRClicked));
     Connect(ID_BTN_FIR_START, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MyFrame::OnStartFIRClicked));
 
-<<<<<<< HEAD
     this->Bind(wxEVT_SORTINGTHREAD_UPDATED, &MyFrame::OnThreadUpdate, this);
     this->Bind(wxEVT_SORTINGTHREAD_COMPLETED, &MyFrame::OnThreadCompletion, this);
     this->Bind(wxEVT_SORTINGTHREAD_CANCELLED, &MyFrame::OnThreadCancel, this);
@@ -124,150 +118,6 @@ void MyFrame::OnThreadCancel(wxThreadEvent& e)
     this->Layout();
 
     this->processing = false;
-=======
-    filterPlot = new mpWindow(this, wxID_ANY, wxPoint(300, 20), wxSize(550, 250), wxBORDER_DEFAULT);
-    DFTPlot = new mpWindow(this, wxID_ANY, wxPoint(300, 300), wxSize(550, 250), wxBORDER_DEFAULT);
-
-    timeAxis = new mpScaleX(wxT("Time (s)"), mpALIGN_BORDER_BOTTOM, false, mpX_NORMAL);
-    amplitudeAxis = new mpScaleY(wxT("Amplitude (dB)"), mpALIGN_BORDER_LEFT, false);
-    freqAxis = new mpScaleX(wxT("Freqency (Hz)"), mpALIGN_BORDER_BOTTOM, false, mpX_NORMAL);
-    magnitudeAxis = new mpScaleY(wxT("Amplitude (dB)"), mpALIGN_BORDER_LEFT, false);
-
-    testSignal = new FilterCalc();
-    filteredSignal = new FilterCalc();
-
-    signalDFT = new FilterCalc();
-    filterDFT = new FilterCalc();
-
-    fir = new FIRfilter();
-    coef = new FIRfilter();
-
-    CreateStatusBar();
-}
-
-void MyFrame::OnStartFIRClicked(wxCommandEvent& e)
-{    
-    filterPlot->DelAllLayers(0, 1);
-    DFTPlot->DelAllLayers(0, 1);
-
-    GetInputValue();
-
-    fir->WIN_TYPE = (FIRfilter::WindowType)(m_choice_fir_type->GetSelection());
-
-    if (m_radioBtn_lowpass->GetValue())
-    {
-        fir->FILT_TYPE = FIRfilter::FilterType::LowPass;
-    }
-
-    if (m_radioBtn_highpass->GetValue())
-    {
-        fir->FILT_TYPE = FIRfilter::FilterType::HighPass;
-    }
-
-    if (m_radioBtn_bandpass->GetValue())
-    {
-        fir->FILT_TYPE = FIRfilter::FilterType::BandPass;
-    }
-
-    if (m_radioBtn_bandstop->GetValue())
-    {
-        fir->FILT_TYPE = FIRfilter::FilterType::BandStop;
-    }
-
-    response = fir->ComputeResponses(sample_freq, filter_order, shift_sample, low_cutoff_freq, high_cutoff_freq);
-    window = fir->ComputeWindow(filter_order);
-    fir_coef = fir->ComputeWindowedResponses(sample_freq, response, window, filter_order);
-    fir_time = std::get<0>(fir->CalcFIRFilter(fir_coef, yy));
-    fir_signal = std::get<1>(fir->CalcFIRFilter(fir_coef, yy));
-
-    wxPen drawingBluePen(*wxBLUE, 1, wxPENSTYLE_LONG_DASH);
-    wxPen drawingRedPen(*wxRED, 1, wxPENSTYLE_LONG_DASH);
-
-    testSignal->GetTestSignal(sample_freq);
-    testSignal->SetPen(drawingBluePen);
-    testSignal->SetContinuity(true);
-
-    yy = std::get<1>(testSignal->CalcTestSignal(sample_freq));
-    fir->GetFIRFilter(fir_coef, yy);
-    fir->SetPen(drawingRedPen);
-    fir->SetContinuity(true);
-
-    filterPlot->AddLayer(timeAxis);
-    filterPlot->AddLayer(amplitudeAxis);
-
-    filterPlot->AddLayer(testSignal);
-    filterPlot->AddLayer(fir);
-
-    filterPlot->Fit(-0.1, 1.1, -3, 3);
-    
-    coef->GetCoefFIR(sample_freq, response, window, filter_order);
-    coef->SetPen(drawingBluePen);
-    coef->SetContinuity(true);
-
-    DFTPlot->AddLayer(freqAxis);
-    DFTPlot->AddLayer(magnitudeAxis);
-
-    DFTPlot->AddLayer(coef);
-
-    DFTPlot->Fit(-0.01, 0.17, -0.1, 0.25);
-
-    int myint = fir_time.size();
-    wxString mystring = wxString::Format(wxT("%i"), myint);
-    //float myfloat = fir_coef[9];
-    //wxString mystring = wxString::Format(wxT("%f"), myfloat);
-    this->SetStatusText(mystring);
-}
-
-void MyFrame::OnStartIIRClicked(wxCommandEvent& e)
-{    
-    filterPlot->DelAllLayers(0, 1);
-    DFTPlot->DelAllLayers(0, 1);
-
-    GetInputValue();
-    SelectResponse();
-
-    tt = std::get<0>(testSignal->CalcTestSignal(sample_freq));
-    yy = std::get<1>(testSignal->CalcTestSignal(sample_freq));
-
-    wxPen drawingBluePen(*wxBLUE, 1, wxPENSTYLE_LONG_DASH);
-    wxPen drawingRedPen(*wxRED, 1, wxPENSTYLE_LONG_DASH);
-
-    testSignal->GetTestSignal(sample_freq);
-    testSignal->SetPen(drawingBluePen);
-    testSignal->SetContinuity(true);
-
-    filteredSignal->GetFilteredSignal(std::make_tuple(tt, yy), a, b);
-    filteredSignal->SetPen(drawingRedPen);
-    filteredSignal->SetContinuity(true);
-
-    filterPlot->AddLayer(timeAxis);
-    filterPlot->AddLayer(amplitudeAxis);
-
-    filterPlot->AddLayer(testSignal);
-    filterPlot->AddLayer(filteredSignal);
-
-    filterPlot->Fit(-0.1, 1.1, -3, 3);
-
-    //![calculate and plot DFT]
-    yy_filtered = std::get<1>(filteredSignal->CalcFilteredSignal(std::make_tuple(tt, yy), a, b));
-
-    signalDFT->CalcDFT(tt, yy);    
-    signalDFT->SetPen(drawingBluePen);
-    signalDFT->SetContinuity(true);
-
-    filterDFT->CalcDFT(tt, yy_filtered);
-    filterDFT->SetPen(drawingRedPen);
-    filterDFT->SetContinuity(true);
-
-    DFTPlot->AddLayer(freqAxis);
-    DFTPlot->AddLayer(magnitudeAxis);
-
-    DFTPlot->AddLayer(signalDFT);
-    DFTPlot->AddLayer(filterDFT);
-
-    DFTPlot->Fit(-10, 100, -0.05, 0.6);
-    //! [calculate and plot DFT]
->>>>>>> 0a03b58ebc67b86781da17136f3e8130bbdc9136
 }
 
 void MyFrame::GetInputValue()

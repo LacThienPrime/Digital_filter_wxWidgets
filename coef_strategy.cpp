@@ -1,9 +1,5 @@
 #include <wx/wx.h>
-<<<<<<< HEAD
 
-=======
-#include <chrono>
->>>>>>> 0a03b58ebc67b86781da17136f3e8130bbdc9136
 #include <math.h>
 #include <cmath>
 
@@ -11,11 +7,7 @@
 
 Context::Context(CoefStrategy* strategy) : strategy(strategy) {}
 
-<<<<<<< HEAD
 std::tuple<std::vector<double>, std::vector<double>> Context::coefCalc(int sample_freq, int cutoff_freq)
-=======
-std::tuple<std::vector<double>, std::vector<double>> Context::coefCalc(int sample_freq, int cutoff_freq) 
->>>>>>> 0a03b58ebc67b86781da17136f3e8130bbdc9136
 {
     return strategy->coefCalc(sample_freq, cutoff_freq);
 }
@@ -43,11 +35,7 @@ std::tuple<std::vector<double>, std::vector<double>> lowpass::coefCalc(int sampl
     return std::make_tuple(a, b);
 }
 
-<<<<<<< HEAD
 std::tuple<std::vector<double>, std::vector<double>> highpass::coefCalc(int sample_freq, int cutoff_freq)
-=======
-std::tuple<std::vector<double>, std::vector<double>> highpass::coefCalc(int sample_freq, int cutoff_freq) 
->>>>>>> 0a03b58ebc67b86781da17136f3e8130bbdc9136
 {
     std::vector<double> a(3);
     std::vector<double> b(3);
@@ -69,11 +57,7 @@ std::tuple<std::vector<double>, std::vector<double>> highpass::coefCalc(int samp
     return std::make_tuple(a, b);
 }
 
-<<<<<<< HEAD
 std::tuple<std::vector<double>, std::vector<double>> bandpass::coefCalc(int sample_freq, int cutoff_freq)
-=======
-std::tuple<std::vector<double>, std::vector<double>> bandpass::coefCalc(int sample_freq, int cutoff_freq) 
->>>>>>> 0a03b58ebc67b86781da17136f3e8130bbdc9136
 {
     std::vector<double> a(3);
     std::vector<double> b(3);
@@ -98,11 +82,7 @@ std::tuple<std::vector<double>, std::vector<double>> bandpass::coefCalc(int samp
     return std::make_tuple(a, b);
 }
 
-<<<<<<< HEAD
 std::tuple<std::vector<double>, std::vector<double>> bandstop::coefCalc(int sample_freq, int cutoff_freq)
-=======
-std::tuple<std::vector<double>, std::vector<double>> bandstop::coefCalc(int sample_freq, int cutoff_freq) 
->>>>>>> 0a03b58ebc67b86781da17136f3e8130bbdc9136
 {
     std::vector<double> a(3);
     std::vector<double> b(3);
