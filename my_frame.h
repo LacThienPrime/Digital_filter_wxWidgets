@@ -7,23 +7,13 @@
 #include "filter_calc.h"
 #include "my_frame_UI.h"
 
-wxDECLARE_EVENT(wxEVT_SORTINGTHREAD_COMPLETED, wxThreadEvent);
-wxDECLARE_EVENT(wxEVT_SORTINGTHREAD_CANCELLED, wxThreadEvent);
-wxDECLARE_EVENT(wxEVT_SORTINGTHREAD_UPDATED, wxThreadEvent);
-
-class MyFrame : public MyFrameUI, public wxThreadHelper
+class MyFrame : public MyFrameUI
 {
 public:
 	MyFrame();
 	//virtual ~MyFrame();
 
 private:
-    bool processing{ false };
-
-    wxCriticalSection dataCs;
-
-    virtual wxThread::ExitCode Entry();
-
     void OnThreadUpdate(wxThreadEvent&);
     void OnThreadCompletion(wxThreadEvent&);
     void OnThreadCancel(wxThreadEvent&);

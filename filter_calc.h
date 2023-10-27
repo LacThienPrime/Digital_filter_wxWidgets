@@ -12,10 +12,10 @@ class FilterCalc : public wxWindow
 {
 public:
     FilterCalc(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, 
-        int sample, std::vector<double> ac, std::vector<double> bc,  wxCriticalSection& cs);
+        int sample, std::vector<double> ac, std::vector<double> bc);
 
     FilterCalc(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size,
-        int sample, wxCriticalSection& cs);
+        int sample);
     
     std::string title;
     double minX, maxX;
@@ -23,16 +23,12 @@ public:
     std::vector<double> b;
     std::vector<double> data;
 
-    std::tuple<std::vector<double>, std::vector<double>> SignalCalc(int sample);
-    std::tuple<std::vector<double>, std::vector<double>> DFTcalc(std::vector<double> signal);
-
 private:
     void OnPaintSignal(wxPaintEvent& evt);
     void OnPaintDFT(wxPaintEvent& evt);
     void OnPaint(wxPaintEvent& evt, bool isDFT);
-    void Initialize();
 
     int sample_freq;
-    wxCriticalSection& valuesCs;
+
     std::tuple<int, double, double> CalSegment(double low, double high); 
 };

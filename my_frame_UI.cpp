@@ -2,17 +2,19 @@
 
 MyFrameUI::MyFrameUI(wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style) : wxFrame(parent, id, title, pos, size, style)
 {
-	this->SetSizeHints(wxSize(1150, 620), wxDefaultSize);
+	this->SetSizeHints(wxSize(900, 620), wxDefaultSize);
 	this->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNFACE));
 
 	mainSizer = new wxGridBagSizer(0, 0);
-	mainSizer->SetFlexibleDirection(wxVERTICAL);
+	mainSizer->SetFlexibleDirection(wxHORIZONTAL);
 	mainSizer->SetNonFlexibleGrowMode(wxFLEX_GROWMODE_ALL);
+
 	mainSizer->SetMinSize(wxSize(890, 610));
 
 	controlSizer = new wxGridBagSizer(0, 0);
 	controlSizer->SetFlexibleDirection(wxBOTH);
 	controlSizer->SetNonFlexibleGrowMode(wxFLEX_GROWMODE_SPECIFIED);
+
 	controlSizer->SetMinSize(wxSize(270, -1));
 	controlPanel = new wxPanel(this, wxID_ANY, wxDefaultPosition, wxSize(270, 520), wxTAB_TRAVERSAL);
 	controlPanel->SetMinSize(wxSize(270, 520));
@@ -63,7 +65,9 @@ MyFrameUI::MyFrameUI(wxWindow* parent, wxWindowID id, const wxString& title, con
 	m_choice_fir_type->SetSelection(0);
 	gSizer1->Add(m_choice_fir_type, 0, wxALL, 5);
 
+
 	sbSizer1->Add(gSizer1, 1, wxEXPAND, 5);
+
 
 	gbSizer3->Add(sbSizer1, wxGBPosition(0, 0), wxGBSpan(6, 2), wxALIGN_CENTER | wxALL, 5);
 
@@ -82,7 +86,7 @@ MyFrameUI::MyFrameUI(wxWindow* parent, wxWindowID id, const wxString& title, con
 	m_staticText21->Wrap(-1);
 	gSizer8->Add(m_staticText21, 0, wxALL, 5);
 
-	m_textCtrl_pass_freq = new wxTextCtrl(sbSizer11->GetStaticBox(), wxID_ANY, wxT("5"), wxDefaultPosition, wxDefaultSize, 0);
+	m_textCtrl_pass_freq = new wxTextCtrl(sbSizer11->GetStaticBox(), wxID_ANY, wxT("50"), wxDefaultPosition, wxDefaultSize, 0);
 	gSizer8->Add(m_textCtrl_pass_freq, 0, wxALL, 5);
 
 	m_staticText22 = new wxStaticText(sbSizer11->GetStaticBox(), wxID_ANY, wxT("Stop freq"), wxDefaultPosition, wxDefaultSize, 0);
@@ -102,7 +106,9 @@ MyFrameUI::MyFrameUI(wxWindow* parent, wxWindowID id, const wxString& title, con
 	m_choice_iir_type->SetSelection(0);
 	gSizer8->Add(m_choice_iir_type, 0, wxALL, 5);
 
+
 	sbSizer11->Add(gSizer8, 1, wxEXPAND, 5);
+
 
 	gbSizer3->Add(sbSizer11, wxGBPosition(7, 0), wxGBSpan(6, 2), wxALIGN_CENTER | wxALL, 5);
 
@@ -122,9 +128,12 @@ MyFrameUI::MyFrameUI(wxWindow* parent, wxWindowID id, const wxString& title, con
 	m_radioBtn_bandstop = new wxRadioButton(sbSizer12->GetStaticBox(), wxID_ANY, wxT("Band-stop"), wxDefaultPosition, wxDefaultSize, 0);
 	gSizer10->Add(m_radioBtn_bandstop, 0, wxALL, 5);
 
+
 	sbSizer12->Add(gSizer10, 1, wxALIGN_CENTER | wxALL, 5);
 
+
 	gbSizer3->Add(sbSizer12, wxGBPosition(14, 0), wxGBSpan(6, 2), wxALIGN_LEFT | wxALL, 5);
+
 
 	controlPanel->SetSizer(gbSizer3);
 	controlPanel->Layout();
@@ -139,7 +148,9 @@ MyFrameUI::MyFrameUI(wxWindow* parent, wxWindowID id, const wxString& title, con
 	m_button_FIR_start = new wxButton(this, wxID_ANY, wxT("START FIR"), wxDefaultPosition, wxSize(80, 40), 0);
 	gSizer12->Add(m_button_FIR_start, 0, wxALL, 5);
 
+
 	controlSizer->Add(gSizer12, wxGBPosition(10, 0), wxGBSpan(1, 2), wxALIGN_CENTER, 5);
+
 
 	controlSizer->AddGrowableRow(0);
 	controlSizer->AddGrowableRow(1);
@@ -161,7 +172,7 @@ MyFrameUI::MyFrameUI(wxWindow* parent, wxWindowID id, const wxString& title, con
 	filterPanel->SetMinSize(wxSize(500, 250));
 	filterPanel->SetMaxSize(wxSize(500, 250));
 
-	filterSizer = new wxBoxSizer(wxVERTICAL);
+	filterSizer = new wxBoxSizer(wxHORIZONTAL);
 
 	filterSizer->SetMinSize(wxSize(500, 250));
 
@@ -174,7 +185,7 @@ MyFrameUI::MyFrameUI(wxWindow* parent, wxWindowID id, const wxString& title, con
 	dftPanel->SetMinSize(wxSize(500, 250));
 	dftPanel->SetMaxSize(wxSize(500, 250));
 
-	dftSizer = new wxBoxSizer(wxVERTICAL);
+	dftSizer = new wxBoxSizer(wxHORIZONTAL);
 
 	dftSizer->SetMinSize(wxSize(500, 250));
 
@@ -183,7 +194,9 @@ MyFrameUI::MyFrameUI(wxWindow* parent, wxWindowID id, const wxString& title, con
 	dftSizer->Fit(dftPanel);
 	plotSizer->Add(dftPanel, 1, wxEXPAND | wxALL, 5);
 
+
 	mainSizer->Add(plotSizer, wxGBPosition(0, 2), wxGBSpan(4, 6), wxEXPAND, 5);
+
 
 	mainSizer->AddGrowableCol(2);
 	mainSizer->AddGrowableCol(3);
