@@ -29,6 +29,8 @@ public:
 private:
     void OnPaintSignal(wxPaintEvent& evt);
     void OnPaintDFT(wxPaintEvent& evt);
+    void OnPaint(wxPaintEvent& evt, bool isDFT);
+    void Initialize();
 
     int sample_freq;
     wxCriticalSection& valuesCs;
