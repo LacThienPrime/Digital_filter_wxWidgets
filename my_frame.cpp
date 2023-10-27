@@ -26,8 +26,8 @@ MyFrame::MyFrame() : MyFrameUI(nullptr, wxID_ANY, "Digital Filter C++", wxDefaul
 void MyFrame::OnStartIIRClicked(wxCommandEvent& e)
 {  
     delete testSignal;
-    delete dft;    
-    
+    delete dft;  
+
     GetInputValue();
     SelectResponse();
 
@@ -38,7 +38,7 @@ void MyFrame::OnStartIIRClicked(wxCommandEvent& e)
     dft = new FilterCalc(dftPanel, wxID_ANY, wxDefaultPosition, this->FromDIP(wxSize(600, 300)), sample_freq, dataCs);
     dftSizer->Add(dft, 1, wxEXPAND, 1);
     dft->title = "DFT";
-
+   
     if (!this->processing)
     {
         this->processing = true;
@@ -62,27 +62,27 @@ wxThread::ExitCode MyFrame::Entry()
 {
     int n = sample_freq;
 
-    for (int i = 0; i < n - 1; i++)
-    {
+    //for (int i = 0; i < n; i++)
+    //{
         wxThreadEvent* e = new wxThreadEvent(wxEVT_SORTINGTHREAD_UPDATED);
-        e->SetPayload<double>(static_cast<double>(i) / static_cast<double>(n - 2));
+        //e->SetPayload<double>(static_cast<double>(i) / static_cast<double>(n - 2));
         wxQueueEvent(this, e);
 
         if (wxThread::This()->TestDestroy())
         {
-            wxThreadEvent* e = new wxThreadEvent(wxEVT_SORTINGTHREAD_CANCELLED);
-            e->SetString("Processing aborted.");
-            wxQueueEvent(this, e);
+            wxThreadEvent* ev = new wxThreadEvent(wxEVT_SORTINGTHREAD_CANCELLED);
+            ev->SetString("Processing aborted.");
+            wxQueueEvent(this, ev);
             return nullptr;
         }
 
         wxCriticalSectionLocker lock(dataCs);
         this->SetStatusText("Processing");
-    }
+    //}
 
-    wxThreadEvent* e = new wxThreadEvent(wxEVT_SORTINGTHREAD_COMPLETED);
-    e->SetString("Completed");
-    wxQueueEvent(this, e);
+    wxThreadEvent* eve = new wxThreadEvent(wxEVT_SORTINGTHREAD_COMPLETED);
+    eve->SetString("Completed");
+    wxQueueEvent(this, eve);
 
     return nullptr;
 }
@@ -99,7 +99,7 @@ void MyFrame::OnClose(wxCloseEvent& e)
 
 void MyFrame::OnThreadUpdate(wxThreadEvent& e)
 {
-    double progressFraction = e.GetPayload<double>();
+    //double progressFraction = e.GetPayload<double>();
 }
 
 void MyFrame::OnThreadCompletion(wxThreadEvent& e)
