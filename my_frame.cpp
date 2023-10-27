@@ -35,9 +35,9 @@ void MyFrame::OnStartIIRClicked(wxCommandEvent& e)
     filterSizer->Add(testSignal, 1, wxEXPAND, 1);
     testSignal->title = "Filter";
 
-    dft = new FilterCalc(dftPanel, wxID_ANY, wxDefaultPosition, this->FromDIP(wxSize(600, 300)), sample_freq, a, b, dataCs);
+    dft = new FilterCalc(dftPanel, wxID_ANY, wxDefaultPosition, this->FromDIP(wxSize(600, 300)), sample_freq, dataCs);
     dftSizer->Add(dft, 1, wxEXPAND, 1);
-    dft->title = "DFT"; 
+    dft->title = "DFT";
 
     if (!this->processing)
     {
