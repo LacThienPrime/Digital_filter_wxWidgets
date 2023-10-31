@@ -7,44 +7,36 @@
 #include "filter_calc.h"
 #include "my_frame_UI.h"
 
-class MyFrame : public MyFrameUI
+wxDECLARE_EVENT(wxEVT_SORTING_COMPLETED, wxThreadEvent);
+wxDECLARE_EVENT(wxEVT_SORTING_CANCELLED, wxThreadEvent);
+wxDECLARE_EVENT(wxEVT_SORTING_UPDATED, wxThreadEvent);
+
+class MyFrame : public MyFrameUI, public wxThreadHelper
 {
 public:
 	MyFrame();
 	//virtual ~MyFrame();
 
 private:
+    bool processing{ false };
+    virtual wxThread::ExitCode Entry();
+
     void OnThreadUpdate(wxThreadEvent&);
     void OnThreadCompletion(wxThreadEvent&);
     void OnThreadCancel(wxThreadEvent&);
 
     void OnClose(wxCloseEvent& e);
 	void OnStartIIRClicked(wxCommandEvent& e);
-    //void OnStartFIRClicked(wxCommandEvent& e);
     void GetInputValue();
     void SelectResponse();
 
     int sample_freq;
     int pass_freq;
     int stop_freq;
-    int filter_order;
-    int shift_sample;
-    int low_cutoff_freq;
-    int high_cutoff_freq;
 
     std::vector<double> a;
     std::vector<double> b;
-    std::vector<double> tt;
-    std::vector<double> yy;
-    std::vector<double> yy_filtered;
-
-    std::vector<double> response;
-    std::vector<double> window;
-    std::vector<double> fir_coef;
-    std::vector<double> fir_time;
-    std::vector<double> fir_signal;
    
     FilterCalc* testSignal;
-    FilterCalc* dft;
 };
 

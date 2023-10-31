@@ -8,27 +8,33 @@
 #include <complex>
 #include <string>
 
-class FilterCalc : public wxWindow
+wxDECLARE_EVENT(wxEVT_SORTINGTHREAD_COMPLETED, wxThreadEvent);
+wxDECLARE_EVENT(wxEVT_SORTINGTHREAD_CANCELLED, wxThreadEvent);
+wxDECLARE_EVENT(wxEVT_SORTINGTHREAD_UPDATED, wxThreadEvent);
+
+class FilterCalc : public wxWindow, public wxThreadHelper
 {
 public:
     FilterCalc(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, 
         int sample, std::vector<double> ac, std::vector<double> bc);
 
-    FilterCalc(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size,
-        int sample);
-    
     std::string title;
     double minX, maxX;
     std::vector<double> a;
     std::vector<double> b;
-    std::vector<double> data;
+    
+    void OnPaintSignal(wxPaintEvent& evt);
 
 private:
-    void OnPaintSignal(wxPaintEvent& evt);
-    void OnPaintDFT(wxPaintEvent& evt);
-    void OnPaint(wxPaintEvent& evt, bool isDFT);
-
     int sample_freq;
 
-    std::tuple<int, double, double> CalSegment(double low, double high); 
+    std::tuple<int, double, double> CalSegment(double low, double high);
+
+    bool processing{ false };
+    //wxCriticalSection dataCs;
+    virtual wxThread::ExitCode Entry();
+
+    void OnThreadUpdate(wxThreadEvent&);
+    void OnThreadCompletion(wxThreadEvent&);
+    void OnThreadCancel(wxThreadEvent&);
 };

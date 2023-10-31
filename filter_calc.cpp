@@ -9,21 +9,37 @@
 
 #include "filter_calc.h"
 
+wxDEFINE_EVENT(wxEVT_SORTINGTHREAD_COMPLETED, wxThreadEvent);
+wxDEFINE_EVENT(wxEVT_SORTINGTHREAD_CANCELLED, wxThreadEvent);
+wxDEFINE_EVENT(wxEVT_SORTINGTHREAD_UPDATED, wxThreadEvent);
+
 FilterCalc::FilterCalc(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, int sample, std::vector<double> ac, std::vector<double> bc)
 	: wxWindow(parent, id, pos, size, wxFULL_REPAINT_ON_RESIZE), sample_freq(sample), a(ac), b(bc)
 {
 	this->SetBackgroundStyle(wxBG_STYLE_PAINT);
-	this->Bind(wxEVT_PAINT, &FilterCalc::OnPaintSignal, this);
+
+	this->Bind(wxEVT_SORTINGTHREAD_UPDATED, &FilterCalc::OnThreadUpdate, this);
+	this->Bind(wxEVT_SORTINGTHREAD_COMPLETED, &FilterCalc::OnThreadCompletion, this);
+	this->Bind(wxEVT_SORTINGTHREAD_CANCELLED, &FilterCalc::OnThreadCancel, this);
+
+	if (!this->processing)
+	{
+		this->processing = true;
+
+		if (CreateThread(wxTHREAD_JOINABLE) != wxTHREAD_NO_ERROR || GetThread()->Run() != wxTHREAD_NO_ERROR)
+		{
+			this->processing = false;
+		}
+		else
+		{
+
+		}
+
+		this->Layout();
+	}
 }
 
-FilterCalc::FilterCalc(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, int sample)
-	: wxWindow(parent, id, pos, size, wxFULL_REPAINT_ON_RESIZE), sample_freq(sample)
-{
-	this->SetBackgroundStyle(wxBG_STYLE_PAINT);
-	this->Bind(wxEVT_PAINT, &FilterCalc::OnPaintDFT, this);
-}
-
-void FilterCalc::OnPaint(wxPaintEvent& evt, bool isDFT)
+void FilterCalc::OnPaintSignal(wxPaintEvent& evt)
 {
 	wxAutoBufferedPaintDC dc(this);
 	dc.Clear();
@@ -78,224 +94,91 @@ void FilterCalc::OnPaint(wxPaintEvent& evt, bool isDFT)
 		double dt, y;
 		std::vector<double> t;
 		std::vector<double> yy;
-		std::vector<double> dft_t;
-		std::vector<double> dft_y;
 		std::vector<double> y_filtered(sample_freq);
 
-		std::thread signalThread;
-		std::thread dftThread;
+		double lowValue = -3.0;
+		double highValue = 3.0;
 
-		if (!isDFT) 
+		int segmentCount = std::get<0>(CalSegment(lowValue, highValue));
+		double rangeLow = std::get<1>(CalSegment(lowValue, highValue));
+		double rangeHigh = std::get<2>(CalSegment(lowValue, highValue));
+
+		double yValueSpan = rangeHigh - rangeLow;
+		lowValue = rangeLow;
+		highValue = rangeHigh;
+
+		double yLinesCount = segmentCount + 1;
+		double xValueSpan = 1.0;
+
+		wxAffineMatrix2D normalizedToValue{};
+		normalizedToValue.Translate(minX, highValue);
+		normalizedToValue.Scale(1, -1);
+		normalizedToValue.Scale(xValueSpan, yValueSpan);
+
+		wxAffineMatrix2D valueToNormalized = normalizedToValue;
+		valueToNormalized.Invert();
+		wxAffineMatrix2D valueToChartArea = normalizedToChartArea;
+		valueToChartArea.Concat(valueToNormalized);
+
+		for (int i = 0; i < yLinesCount; i++)
 		{
-			signalThread = std::thread([&]
-				{
-					double lowValue = -3.0;
-					double highValue = 3.0;
+			double normalizedLineY = static_cast<double>(i) / (yLinesCount - 1);
 
-					int segmentCount = std::get<0>(CalSegment(lowValue, highValue));
-					double rangeLow = std::get<1>(CalSegment(lowValue, highValue));
-					double rangeHigh = std::get<2>(CalSegment(lowValue, highValue));
+			auto lineStartPoint = normalizedToChartArea.TransformPoint({ 0, normalizedLineY });
+			auto lineEndPoint = normalizedToChartArea.TransformPoint({ 1, normalizedLineY });
 
-					double yValueSpan = rangeHigh - rangeLow;
-					lowValue = rangeLow;
-					highValue = rangeHigh;
+			wxPoint2DDouble linePoints[] = { lineStartPoint, lineEndPoint };
+			gc->StrokeLines(2, linePoints);
 
-					double yLinesCount = segmentCount + 1;
-					double xValueSpan = 1.0;
+			double valueAtLineY = normalizedToValue.TransformPoint({ 0, normalizedLineY }).m_y;
 
-					wxAffineMatrix2D normalizedToValue{};
-					normalizedToValue.Translate(minX, highValue);
-					normalizedToValue.Scale(1, -1);
-					normalizedToValue.Scale(xValueSpan, yValueSpan);
+			auto text = wxString::Format("%.2f", valueAtLineY);
+			text = wxControl::Ellipsize(text, dc, wxELLIPSIZE_MIDDLE, chartArea.GetLeft() - labelsToChartAreaMargin);
 
-					wxAffineMatrix2D valueToNormalized = normalizedToValue;
-					valueToNormalized.Invert();
-					wxAffineMatrix2D valueToChartArea = normalizedToChartArea;
-					valueToChartArea.Concat(valueToNormalized);
-
-					for (int i = 0; i < yLinesCount; i++)
-					{
-						double normalizedLineY = static_cast<double>(i) / (yLinesCount - 1);
-
-						auto lineStartPoint = normalizedToChartArea.TransformPoint({ 0, normalizedLineY });
-						auto lineEndPoint = normalizedToChartArea.TransformPoint({ 1, normalizedLineY });
-
-						wxPoint2DDouble linePoints[] = { lineStartPoint, lineEndPoint };
-						gc->StrokeLines(2, linePoints);
-
-						double valueAtLineY = normalizedToValue.TransformPoint({ 0, normalizedLineY }).m_y;
-
-						auto text = wxString::Format("%.2f", valueAtLineY);
-						text = wxControl::Ellipsize(text, dc, wxELLIPSIZE_MIDDLE, chartArea.GetLeft() - labelsToChartAreaMargin);
-
-						double tw, th;
-						gc->GetTextExtent(text, &tw, &th);
-						gc->DrawText(text, chartArea.GetLeft() - labelsToChartAreaMargin - tw, lineStartPoint.m_y - th / 2.0);
-					}
-
-					for (int i = 0; i < sample_freq; i++)
-					{
-						dt = static_cast<double>(i) / sample_freq;
-						t.push_back(dt);
-
-						y = sin(2 * M_PI * 5.0 * dt) + 0.6 * sin(2 * M_PI * 50.0 * dt) + 0.8 * sin(2 * M_PI * 80.0 * dt);
-						yy.push_back(y);
-
-						testSignal[i] = valueToChartArea.TransformPoint({ dt, y });
-					}
-
-					for (int j = 0; j < sample_freq; j++)
-					{
-						if (j < 3)
-						{
-							y_filtered[j] = 0.0;
-						}
-						else
-						{
-							y_filtered[j] = a[1] * y_filtered[j - 1] + a[2] * y_filtered[j - 2] + b[0] * yy[j] + b[1] * yy[j - 1] + b[2] * yy[j - 2];
-						}
-
-						filteredSignal[j] = valueToChartArea.TransformPoint({ t[j], y_filtered[j] });
-					}
-
-					for (int j = 0; j < sample_freq; j++)
-					{
-						filteredSignal[j] = valueToChartArea.TransformPoint({ t[j], y_filtered[j] });
-					}
-
-					gc->SetPen(wxPen(*wxBLUE, 1));
-					gc->StrokeLines(sample_freq, testSignal);
-					gc->SetPen(wxPen(*wxRED, 1));
-					gc->StrokeLines(sample_freq, filteredSignal);
-				}
-			);
-		}
-		else
-		{
-			dftThread = std::thread([&] 
-				{
-					double lowValue = 0.0;
-					double highValue = 0.5;
-
-					int segmentCount = std::get<0>(CalSegment(lowValue, highValue));
-					double rangeLow = std::get<1>(CalSegment(lowValue, highValue));
-					double rangeHigh = std::get<2>(CalSegment(lowValue, highValue));
-
-					double yValueSpan = rangeHigh - rangeLow;
-					lowValue = rangeLow;
-					highValue = rangeHigh;
-
-					double yLinesCount = segmentCount + 1;
-					double xValueSpan = 100.0;
-
-					wxAffineMatrix2D normalizedToValue{};
-					normalizedToValue.Translate(minX, highValue);
-					normalizedToValue.Scale(1, -1);
-					normalizedToValue.Scale(xValueSpan, yValueSpan);
-
-					wxAffineMatrix2D valueToNormalized = normalizedToValue;
-					valueToNormalized.Invert();
-					wxAffineMatrix2D valueToChartArea = normalizedToChartArea;
-					valueToChartArea.Concat(valueToNormalized);
-
-					for (int i = 0; i < yLinesCount; i++)
-					{
-						double normalizedLineY = static_cast<double>(i) / (yLinesCount - 1);
-
-						auto lineStartPoint = normalizedToChartArea.TransformPoint({ 0, normalizedLineY });
-						auto lineEndPoint = normalizedToChartArea.TransformPoint({ 1, normalizedLineY });
-
-						wxPoint2DDouble linePoints[] = { lineStartPoint, lineEndPoint };
-						gc->StrokeLines(2, linePoints);
-
-						double valueAtLineY = normalizedToValue.TransformPoint({ 0, normalizedLineY }).m_y;
-
-						auto text = wxString::Format("%.2f", valueAtLineY);
-						text = wxControl::Ellipsize(text, dc, wxELLIPSIZE_MIDDLE, chartArea.GetLeft() - labelsToChartAreaMargin);
-
-						double tw, th;
-						gc->GetTextExtent(text, &tw, &th);
-						gc->DrawText(text, chartArea.GetLeft() - labelsToChartAreaMargin - tw, lineStartPoint.m_y - th / 2.0);
-					}
-
-					for (int i = 0; i < sample_freq; i++)
-					{
-						dt = static_cast<double>(i) / sample_freq;
-						t.push_back(dt);
-
-						y = sin(2 * M_PI * 5.0 * dt) + 0.6 * sin(2 * M_PI * 50.0 * dt) + 0.8 * sin(2 * M_PI * 80.0 * dt);
-						yy.push_back(y);
-					}
-
-					int N = sample_freq;
-					int K = N;
-
-					std::complex<double> intSum;
-
-					std::vector<std::complex<double>> output;
-					output.reserve(K);
-
-					for (int k = 0; k < K; k++)
-					{
-						intSum = std::complex<double>(0.0, 0.0);
-
-						for (int n = 0; n < N; n++)
-						{
-							double realPart = cos((2 * M_PI / N) * k * n);
-							double imagPart = sin((2 * M_PI / N) * k * n);
-
-							std::complex<double> w(realPart, -imagPart);
-
-							intSum += yy[n] * w;
-						}
-
-						output.push_back(intSum);
-					}
-
-					std::vector<double> xd;
-					std::vector<double> yd;
-
-					for (int n = 0; n < N; n++)
-					{
-						xd.push_back(n);
-					}
-
-					for (auto& ii : output)
-					{
-						ii = ii / static_cast<double>(N);
-						yd.push_back(std::abs(ii));
-					}
-
-					for (int j = 0; j < sample_freq; j++)
-					{
-						filteredSignal[j] = valueToChartArea.TransformPoint({ xd[j], yd[j] });
-					}
-
-					gc->SetPen(wxPen(*wxRED, 1));
-					gc->StrokeLines(sample_freq, filteredSignal);
-				}
-			);
+			double tw, th;
+			gc->GetTextExtent(text, &tw, &th);
+			gc->DrawText(text, chartArea.GetLeft() - labelsToChartAreaMargin - tw, lineStartPoint.m_y - th / 2.0);
 		}
 
-		if (signalThread.joinable())
-			signalThread.join();
-		if (dftThread.joinable())
-			dftThread.join();
+		for (int i = 0; i < sample_freq; i++)
+		{
+			dt = static_cast<double>(i) / sample_freq;
+			t.push_back(dt);
+
+			y = sin(2 * M_PI * 5.0 * dt) + 0.6 * sin(2 * M_PI * 50.0 * dt) + 0.8 * sin(2 * M_PI * 80.0 * dt);
+			yy.push_back(y);
+
+			testSignal[i] = valueToChartArea.TransformPoint({ dt, y });
+		}
+
+		for (int j = 0; j < sample_freq; j++)
+		{
+			if (j < 3)
+			{
+				y_filtered[j] = 0.0;
+			}
+			else
+			{
+				y_filtered[j] = a[1] * y_filtered[j - 1] + a[2] * y_filtered[j - 2] + b[0] * yy[j] + b[1] * yy[j - 1] + b[2] * yy[j - 2];
+			}
+
+			filteredSignal[j] = valueToChartArea.TransformPoint({ t[j], y_filtered[j] });
+		}
+
+		for (int j = 0; j < sample_freq; j++)
+		{
+			filteredSignal[j] = valueToChartArea.TransformPoint({ t[j], y_filtered[j] });
+		}
+
+		gc->SetPen(wxPen(*wxBLUE, 1));
+		gc->StrokeLines(sample_freq, testSignal);
+		gc->SetPen(wxPen(*wxRED, 1));
+		gc->StrokeLines(sample_freq, filteredSignal);
 
 		delete[] testSignal;
 		delete[] filteredSignal;
 		delete gc;
 	}
-}
-
-void FilterCalc::OnPaintSignal(wxPaintEvent& evt)
-{
-	OnPaint(evt, false);
-}
-
-void FilterCalc::OnPaintDFT(wxPaintEvent& evt)
-{
-	OnPaint(evt, true);
 }
 
 std::tuple<int, double, double> FilterCalc::CalSegment(double origLow, double origHigh)
@@ -321,3 +204,44 @@ std::tuple<int, double, double> FilterCalc::CalSegment(double origLow, double or
 
 	return std::make_tuple(10, origLow, origHigh);
 }
+
+wxThread::ExitCode FilterCalc::Entry()
+{
+	wxThreadEvent* e = new wxThreadEvent(wxEVT_SORTINGTHREAD_UPDATED);
+	wxQueueEvent(this, e);
+
+	if (wxThread::This()->TestDestroy())
+	{
+		wxThreadEvent* ev = new wxThreadEvent(wxEVT_SORTINGTHREAD_CANCELLED);
+		wxQueueEvent(this, ev);
+		return nullptr;
+	}
+
+	wxThreadEvent* eve = new wxThreadEvent(wxEVT_SORTINGTHREAD_COMPLETED);
+	this->Bind(wxEVT_PAINT, &FilterCalc::OnPaintSignal, this);
+	wxQueueEvent(this, eve);
+	
+	return nullptr;
+}
+
+void FilterCalc::OnThreadUpdate(wxThreadEvent& e)
+{
+	
+}
+
+void FilterCalc::OnThreadCompletion(wxThreadEvent& e)
+{
+	this->Layout();
+
+	GetThread()->Wait();
+
+	this->processing = false;
+}
+
+void FilterCalc::OnThreadCancel(wxThreadEvent& e)
+{
+	this->Layout();
+
+	this->processing = false;
+}
+
