@@ -17,6 +17,7 @@ MyFrame::MyFrame() : MyFrameUI(nullptr, wxID_ANY, "Digital Filter C++", wxDefaul
 void MyFrame::OnStartIIRClicked(wxCommandEvent& e)
 {
     delete testSignal;
+    delete dftSignal;
 
     GetInputValue();
     SelectResponse();
@@ -24,6 +25,10 @@ void MyFrame::OnStartIIRClicked(wxCommandEvent& e)
     testSignal = new FilterCalc(filterPanel, wxID_ANY, wxDefaultPosition, this->FromDIP(wxSize(600, 300)), sample_freq, a, b);
     filterSizer->Add(testSignal, 1, wxEXPAND, 1);
     testSignal->title = "Filter";
+
+    dftSignal = new FilterCalc(dftPanel, wxID_ANY, wxDefaultPosition, this->FromDIP(wxSize(600, 300)), sample_freq, a, b);
+    dftSizer->Add(dftSignal, 1, wxEXPAND, 1);
+    dftSignal->title = "DFT";
 }
 
 void MyFrame::OnClose(wxCloseEvent& e)

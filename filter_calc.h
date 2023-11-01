@@ -31,7 +31,6 @@ private:
     std::tuple<int, double, double> CalSegment(double low, double high);
 
     bool processing{ false };
-    wxCriticalSection dataCs;
     virtual wxThread::ExitCode Entry();
 
     void OnThreadUpdate(wxThreadEvent&);

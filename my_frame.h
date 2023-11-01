@@ -27,5 +27,6 @@ private:
     std::vector<double> b;
    
     FilterCalc* testSignal;
+    FilterCalc* dftSignal;
 };
 

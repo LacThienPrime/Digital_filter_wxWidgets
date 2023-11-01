@@ -41,18 +41,14 @@ FilterCalc::FilterCalc(wxWindow* parent, wxWindowID id, const wxPoint& pos, cons
 
 wxThread::ExitCode FilterCalc::Entry()
 {
-	for (int i = 0; i < sample_freq - 1; i++)
-	{
-		wxThreadEvent* e = new wxThreadEvent(wxEVT_SORTINGTHREAD_UPDATED);
-		e->SetPayload<double>(static_cast<double>(i) / static_cast<double>(sample_freq - 2));
-		wxQueueEvent(this, e);
+	wxThreadEvent* e = new wxThreadEvent(wxEVT_SORTINGTHREAD_UPDATED);
+	wxQueueEvent(this, e);
 
-		if (wxThread::This()->TestDestroy())
-		{
-			wxThreadEvent* ev = new wxThreadEvent(wxEVT_SORTINGTHREAD_CANCELLED);
-			wxQueueEvent(this, ev);
-			return nullptr;
-		}	
+	if (wxThread::This()->TestDestroy())
+	{
+		wxThreadEvent* ev = new wxThreadEvent(wxEVT_SORTINGTHREAD_CANCELLED);
+		wxQueueEvent(this, ev);
+		return nullptr;
 	}
 
 	wxThreadEvent* eve = new wxThreadEvent(wxEVT_SORTINGTHREAD_COMPLETED);
@@ -161,6 +157,7 @@ void FilterCalc::OnPaintSignal(wxPaintEvent& evt)
 
 		wxAffineMatrix2D valueToNormalized = normalizedToValue;
 		valueToNormalized.Invert();
+
 		wxAffineMatrix2D valueToChartArea = normalizedToChartArea;
 		valueToChartArea.Concat(valueToNormalized);
 
@@ -184,7 +181,6 @@ void FilterCalc::OnPaintSignal(wxPaintEvent& evt)
 			gc->DrawText(text, chartArea.GetLeft() - labelsToChartAreaMargin - tw, lineStartPoint.m_y - th / 2.0);
 		}
 
-		wxCriticalSectionLocker lock(dataCs);
 		for (int i = 0; i < sample_freq; i++)
 		{
 			dt = static_cast<double>(i) / sample_freq;
