@@ -39,6 +39,50 @@ FilterCalc::FilterCalc(wxWindow* parent, wxWindowID id, const wxPoint& pos, cons
 	}
 }
 
+wxThread::ExitCode FilterCalc::Entry()
+{
+	for (int i = 0; i < sample_freq - 1; i++)
+	{
+		wxThreadEvent* e = new wxThreadEvent(wxEVT_SORTINGTHREAD_UPDATED);
+		e->SetPayload<double>(static_cast<double>(i) / static_cast<double>(sample_freq - 2));
+		wxQueueEvent(this, e);
+
+		if (wxThread::This()->TestDestroy())
+		{
+			wxThreadEvent* ev = new wxThreadEvent(wxEVT_SORTINGTHREAD_CANCELLED);
+			wxQueueEvent(this, ev);
+			return nullptr;
+		}	
+	}
+
+	wxThreadEvent* eve = new wxThreadEvent(wxEVT_SORTINGTHREAD_COMPLETED);
+	this->Bind(wxEVT_PAINT, &FilterCalc::OnPaintSignal, this);
+	wxQueueEvent(this, eve);
+
+	return nullptr;
+}
+
+void FilterCalc::OnThreadUpdate(wxThreadEvent& e)
+{
+
+}
+
+void FilterCalc::OnThreadCompletion(wxThreadEvent& e)
+{
+	this->Layout();
+
+	GetThread()->Wait();
+
+	this->processing = false;
+}
+
+void FilterCalc::OnThreadCancel(wxThreadEvent& e)
+{
+	this->Layout();
+
+	this->processing = false;
+}
+
 void FilterCalc::OnPaintSignal(wxPaintEvent& evt)
 {
 	wxAutoBufferedPaintDC dc(this);
@@ -140,6 +184,7 @@ void FilterCalc::OnPaintSignal(wxPaintEvent& evt)
 			gc->DrawText(text, chartArea.GetLeft() - labelsToChartAreaMargin - tw, lineStartPoint.m_y - th / 2.0);
 		}
 
+		wxCriticalSectionLocker lock(dataCs);
 		for (int i = 0; i < sample_freq; i++)
 		{
 			dt = static_cast<double>(i) / sample_freq;
@@ -204,44 +249,3 @@ std::tuple<int, double, double> FilterCalc::CalSegment(double origLow, double or
 
 	return std::make_tuple(10, origLow, origHigh);
 }
-
-wxThread::ExitCode FilterCalc::Entry()
-{
-	wxThreadEvent* e = new wxThreadEvent(wxEVT_SORTINGTHREAD_UPDATED);
-	wxQueueEvent(this, e);
-
-	if (wxThread::This()->TestDestroy())
-	{
-		wxThreadEvent* ev = new wxThreadEvent(wxEVT_SORTINGTHREAD_CANCELLED);
-		wxQueueEvent(this, ev);
-		return nullptr;
-	}
-
-	wxThreadEvent* eve = new wxThreadEvent(wxEVT_SORTINGTHREAD_COMPLETED);
-	this->Bind(wxEVT_PAINT, &FilterCalc::OnPaintSignal, this);
-	wxQueueEvent(this, eve);
-	
-	return nullptr;
-}
-
-void FilterCalc::OnThreadUpdate(wxThreadEvent& e)
-{
-	
-}
-
-void FilterCalc::OnThreadCompletion(wxThreadEvent& e)
-{
-	this->Layout();
-
-	GetThread()->Wait();
-
-	this->processing = false;
-}
-
-void FilterCalc::OnThreadCancel(wxThreadEvent& e)
-{
-	this->Layout();
-
-	this->processing = false;
-}
-

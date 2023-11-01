@@ -23,15 +23,15 @@ public:
     std::vector<double> a;
     std::vector<double> b;
     
+    int sample_freq;
+    
     void OnPaintSignal(wxPaintEvent& evt);
 
 private:
-    int sample_freq;
-
     std::tuple<int, double, double> CalSegment(double low, double high);
 
     bool processing{ false };
-    //wxCriticalSection dataCs;
+    wxCriticalSection dataCs;
     virtual wxThread::ExitCode Entry();
 
     void OnThreadUpdate(wxThreadEvent&);
