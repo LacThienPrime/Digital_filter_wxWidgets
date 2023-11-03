@@ -13,8 +13,8 @@ wxDEFINE_EVENT(wxEVT_SORTINGTHREAD_COMPLETED, wxThreadEvent);
 wxDEFINE_EVENT(wxEVT_SORTINGTHREAD_CANCELLED, wxThreadEvent);
 wxDEFINE_EVENT(wxEVT_SORTINGTHREAD_UPDATED, wxThreadEvent);
 
-FilterCalc::FilterCalc(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, int sample, std::vector<double> ac, std::vector<double> bc)
-	: wxWindow(parent, id, pos, size, wxFULL_REPAINT_ON_RESIZE), sample_freq(sample), a(ac), b(bc)
+FilterCalc::FilterCalc(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size)
+	: wxWindow(parent, id, pos, size, wxFULL_REPAINT_ON_RESIZE)
 {
 	this->SetBackgroundStyle(wxBG_STYLE_PAINT);
 
@@ -52,7 +52,6 @@ wxThread::ExitCode FilterCalc::Entry()
 	}
 
 	wxThreadEvent* eve = new wxThreadEvent(wxEVT_SORTINGTHREAD_COMPLETED);
-	this->Bind(wxEVT_PAINT, &FilterCalc::OnPaintSignal, this);
 	wxQueueEvent(this, eve);
 
 	return nullptr;
@@ -181,17 +180,17 @@ void FilterCalc::OnPaintSignal(wxPaintEvent& evt)
 			gc->DrawText(text, chartArea.GetLeft() - labelsToChartAreaMargin - tw, lineStartPoint.m_y - th / 2.0);
 		}
 
-		wxPoint2DDouble* testSignal = new wxPoint2DDouble[sample_freq];
-		wxPoint2DDouble* filteredSignal = new wxPoint2DDouble[sample_freq];
+		wxPoint2DDouble* testSignal = new wxPoint2DDouble[sample];
+		wxPoint2DDouble* filteredSignal = new wxPoint2DDouble[sample];
 
 		double dt, y;
 		std::vector<double> t;
 		std::vector<double> yy;
-		std::vector<double> y_filtered(sample_freq);
+		std::vector<double> y_filtered(sample);
 
-		for (int i = 0; i < sample_freq; i++)
+		for (int i = 0; i < sample; i++)
 		{
-			dt = static_cast<double>(i) / sample_freq;
+			dt = static_cast<double>(i) / sample;
 			t.push_back(dt);
 
 			y = sin(2 * M_PI * 5.0 * dt) + 0.6 * sin(2 * M_PI * 50.0 * dt) + 0.8 * sin(2 * M_PI * 80.0 * dt);
@@ -200,7 +199,7 @@ void FilterCalc::OnPaintSignal(wxPaintEvent& evt)
 			testSignal[i] = valueToChartArea.TransformPoint({ dt, y });
 		}
 
-		for (int j = 0; j < sample_freq; j++)
+		for (int j = 0; j < sample; j++)
 		{
 			if (j < 3)
 			{
@@ -214,15 +213,15 @@ void FilterCalc::OnPaintSignal(wxPaintEvent& evt)
 			filteredSignal[j] = valueToChartArea.TransformPoint({ t[j], y_filtered[j] });
 		}
 
-		for (int j = 0; j < sample_freq; j++)
+		for (int j = 0; j < sample; j++)
 		{
 			filteredSignal[j] = valueToChartArea.TransformPoint({ t[j], y_filtered[j] });
 		}
 
 		gc->SetPen(wxPen(*wxBLUE, 1));
-		gc->StrokeLines(sample_freq, testSignal);
+		gc->StrokeLines(sample, testSignal);
 		gc->SetPen(wxPen(*wxRED, 1));
-		gc->StrokeLines(sample_freq, filteredSignal);
+		gc->StrokeLines(sample, filteredSignal);
 
 		delete[] testSignal;
 		delete[] filteredSignal;
@@ -252,4 +251,11 @@ std::tuple<int, double, double> FilterCalc::CalSegment(double origLow, double or
 	}
 
 	return std::make_tuple(6, origLow, origHigh);
+}
+
+void FilterCalc::UpdateValues(int s, std::vector<double> &ac, std::vector<double> &bc)
+{
+	sample = s;
+	a = ac;
+	b = bc;
 }

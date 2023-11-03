@@ -11,36 +11,38 @@ MyFrame::MyFrame() : MyFrameUI(nullptr, wxID_ANY, "Digital Filter C++", wxDefaul
 
     m_radioBtn_lowpass->SetValue(true);
 
+    testSignal = new FilterCalc(filterPanel, wxID_ANY, wxDefaultPosition, this->FromDIP(wxSize(600, 300)));
+    filterSizer->Add(testSignal, 1, wxEXPAND, 1);
+    testSignal->title = "Filter";
+
+    dftSignal = new FilterCalc(dftPanel, wxID_ANY, wxDefaultPosition, this->FromDIP(wxSize(600, 300)));
+    dftSizer->Add(dftSignal, 1, wxEXPAND, 1);
+    dftSignal->title = "DFT";
+
     this->Bind(wxEVT_CLOSE_WINDOW, &MyFrame::OnClose, this);
 }
 
 void MyFrame::OnStartIIRClicked(wxCommandEvent& e)
-{
-    delete testSignal;
-    delete dftSignal;
+{     
+    testSignal->Refresh();
+    dftSignal->Refresh();
 
-    GetInputValue();
+    sample_freq = atoi((m_textCtrl_sample->GetValue()).c_str());
+    pass_freq = atoi((m_textCtrl_pass_freq->GetValue()).c_str());
+    stop_freq = atoi((m_textCtrl_stop_freq->GetValue()).c_str());
+
     SelectResponse();
 
-    testSignal = new FilterCalc(filterPanel, wxID_ANY, wxDefaultPosition, this->FromDIP(wxSize(600, 300)), sample_freq, a, b);
-    filterSizer->Add(testSignal, 1, wxEXPAND, 1);
-    testSignal->title = "Filter";
+    testSignal->UpdateValues(sample_freq, a, b);
+    dftSignal->UpdateValues(sample_freq, a, b);
 
-    dftSignal = new FilterCalc(dftPanel, wxID_ANY, wxDefaultPosition, this->FromDIP(wxSize(600, 300)), sample_freq, a, b);
-    dftSizer->Add(dftSignal, 1, wxEXPAND, 1);
-    dftSignal->title = "DFT";
+    testSignal->Bind(wxEVT_PAINT, &FilterCalc::OnPaintSignal, testSignal);
+    dftSignal->Bind(wxEVT_PAINT, &FilterCalc::OnPaintSignal, dftSignal);
 }
 
 void MyFrame::OnClose(wxCloseEvent& e)
 {
     this->Destroy();
-}
-
-void MyFrame::GetInputValue()
-{
-    sample_freq = atoi((m_textCtrl_sample->GetValue()).c_str());
-    pass_freq = atoi((m_textCtrl_pass_freq->GetValue()).c_str());
-    stop_freq = atoi((m_textCtrl_stop_freq->GetValue()).c_str());
 }
 
 void MyFrame::SelectResponse()

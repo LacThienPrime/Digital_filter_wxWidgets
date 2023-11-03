@@ -15,18 +15,17 @@ wxDECLARE_EVENT(wxEVT_SORTINGTHREAD_UPDATED, wxThreadEvent);
 class FilterCalc : public wxWindow, public wxThreadHelper
 {
 public:
-    FilterCalc(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, 
-        int sample, std::vector<double> ac, std::vector<double> bc);
+    FilterCalc(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size);
 
+    int sample;
     std::string title;
     std::vector<double> a;
     std::vector<double> b;
-    
-    int sample_freq;
-    
-    void OnPaintSignal(wxPaintEvent& evt);
 
-private:
+    void OnPaintSignal(wxPaintEvent& evt);
+    void UpdateValues(int s, std::vector<double> &ac, std::vector<double> &bc);
+
+private:    
     std::tuple<int, double, double> CalSegment(double low, double high);
 
     bool processing{ false };

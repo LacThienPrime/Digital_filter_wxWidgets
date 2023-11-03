@@ -14,8 +14,7 @@ public:
 
 private:
     void OnClose(wxCloseEvent& e);
-	void OnStartIIRClicked(wxCommandEvent& e);
-    void GetInputValue();
+    void OnStartIIRClicked(wxCommandEvent& e);
     void SelectResponse();
 
     int sample_freq;
