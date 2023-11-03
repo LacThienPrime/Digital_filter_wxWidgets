@@ -9,9 +9,9 @@ MyFrame::MyFrame() : MyFrameUI(nullptr, wxID_ANY, "Digital Filter C++", wxDefaul
 {
     Connect(ID_BTN_IIR_START, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MyFrame::OnStartIIRClicked));
 
-    this->Bind(wxEVT_CLOSE_WINDOW, &MyFrame::OnClose, this);
+    m_radioBtn_lowpass->SetValue(true);
 
-    CreateStatusBar();
+    this->Bind(wxEVT_CLOSE_WINDOW, &MyFrame::OnClose, this);
 }
 
 void MyFrame::OnStartIIRClicked(wxCommandEvent& e)
@@ -47,7 +47,8 @@ void MyFrame::SelectResponse()
 {
     if (m_radioBtn_lowpass->GetValue())
     {
-        Context context(new lowpass());
+        std::unique_ptr<CoefStrategy> strategy = std::make_unique<lowpass>();
+        Context context(strategy.get());
         auto coefficients = context.coefCalc(sample_freq, pass_freq);
 
         a = std::get<0>(coefficients);
@@ -56,7 +57,8 @@ void MyFrame::SelectResponse()
 
     else if (m_radioBtn_highpass->GetValue())
     {
-        Context context(new highpass());
+        std::unique_ptr<CoefStrategy> strategy = std::make_unique<highpass>();
+        Context context(strategy.get());
         auto coefficients = context.coefCalc(sample_freq, pass_freq);
 
         a = std::get<0>(coefficients);
@@ -65,7 +67,8 @@ void MyFrame::SelectResponse()
 
     else if (m_radioBtn_bandpass->GetValue())
     {
-        Context context(new bandpass());
+        std::unique_ptr<CoefStrategy> strategy = std::make_unique<bandpass>();
+        Context context(strategy.get());
         auto coefficients = context.coefCalc(sample_freq, pass_freq);
 
         a = std::get<0>(coefficients);
@@ -74,7 +77,8 @@ void MyFrame::SelectResponse()
 
     else if (m_radioBtn_bandstop->GetValue())
     {
-        Context context(new bandstop());
+        std::unique_ptr<CoefStrategy> strategy = std::make_unique<bandstop>();
+        Context context(strategy.get());
         auto coefficients = context.coefCalc(sample_freq, stop_freq);
 
         a = std::get<0>(coefficients);

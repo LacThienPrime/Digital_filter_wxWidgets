@@ -101,12 +101,12 @@ void FilterCalc::OnPaintSignal(wxPaintEvent& evt)
 		wxRect2DDouble fullArea{ 0, 0, static_cast<double>(GetSize().GetWidth()), static_cast<double>(GetSize().GetHeight()) };
 
 		const double marginX = fullArea.GetSize().GetWidth() / 15.0;
-		const double marginTop = std::max(fullArea.GetSize().GetHeight() / 16.0, titleTopBottomMinimumMargin * 2.0 + 20.0);
-		const double marginBottom = fullArea.GetSize().GetHeight() / 10.0;
+		const double marginTop = std::max(fullArea.GetSize().GetHeight() / 15.0, titleTopBottomMinimumMargin * 2.0 + 20.0);
+		const double marginBottom = fullArea.GetSize().GetHeight() / 15.0;
 		double labelsToChartAreaMargin = this->FromDIP(10);
 
 		wxRect2DDouble chartArea = fullArea;
-		chartArea.Inset(marginX, marginTop, marginX, marginBottom);
+		chartArea.Inset(marginX, marginTop, marginX + 10.0, marginBottom + 30.0);
 
 		gc->DrawText(this->title, (fullArea.GetSize().GetWidth() - tw) / 2.0, (marginTop - th) / 2.0);
 
@@ -116,25 +116,6 @@ void FilterCalc::OnPaintSignal(wxPaintEvent& evt)
 
 		gc->SetPen(wxPen(wxColor(128, 128, 128)));
 		gc->SetFont(*wxNORMAL_FONT, wxSystemSettings::GetAppearance().IsDark() ? *wxWHITE : *wxBLACK);
-
-		wxPoint2DDouble leftHLinePoints[] = {
-			normalizedToChartArea.TransformPoint({0, 0}),
-			normalizedToChartArea.TransformPoint({0, 1}) };
-
-		wxPoint2DDouble rightHLinePoints[] = {
-			normalizedToChartArea.TransformPoint({1, 0}),
-			normalizedToChartArea.TransformPoint({1, 1}) };
-
-		gc->StrokeLines(2, leftHLinePoints);
-		gc->StrokeLines(2, rightHLinePoints);
-
-		wxPoint2DDouble* testSignal = new wxPoint2DDouble[sample_freq];
-		wxPoint2DDouble* filteredSignal = new wxPoint2DDouble[sample_freq];
-
-		double dt, y;
-		std::vector<double> t;
-		std::vector<double> yy;
-		std::vector<double> y_filtered(sample_freq);
 
 		double lowValue = -3.0;
 		double highValue = 3.0;
@@ -147,11 +128,11 @@ void FilterCalc::OnPaintSignal(wxPaintEvent& evt)
 		lowValue = rangeLow;
 		highValue = rangeHigh;
 
-		double yLinesCount = segmentCount + 1;
+		double yLinesCount = segmentCount + 1.0;
 		double xValueSpan = 1.0;
 
 		wxAffineMatrix2D normalizedToValue{};
-		normalizedToValue.Translate(minX, highValue);
+		normalizedToValue.Translate(0.0, highValue);
 		normalizedToValue.Scale(1, -1);
 		normalizedToValue.Scale(xValueSpan, yValueSpan);
 
@@ -160,17 +141,36 @@ void FilterCalc::OnPaintSignal(wxPaintEvent& evt)
 
 		wxAffineMatrix2D valueToChartArea = normalizedToChartArea;
 		valueToChartArea.Concat(valueToNormalized);
-
-		for (int i = 0; i < yLinesCount; i++)
+		
+		for (int i = 0; i < 11; i++)
 		{
-			double normalizedLineY = static_cast<double>(i) / (yLinesCount - 1);
+			double normalizedLineX = static_cast<double>(i) / 10;
+			auto startPoint = normalizedToChartArea.TransformPoint({ normalizedLineX, 0 });
+			auto endPoint = normalizedToChartArea.TransformPoint({ normalizedLineX, 1 });
 
+			wxPoint2DDouble bottomHLinePoints[] = { startPoint, endPoint };
+
+			gc->StrokeLines(2, bottomHLinePoints);
+
+			double valueAtLineX = normalizedToValue.TransformPoint({ normalizedLineX, 0 }).m_x;
+
+			auto text = wxString::Format("%.2f", valueAtLineX);
+			text = wxControl::Ellipsize(text, dc, wxELLIPSIZE_MIDDLE, chartArea.GetBottom() - marginBottom);
+
+			double tw, th;
+			gc->GetTextExtent(text, &tw, &th);
+			gc->DrawText(text, startPoint.m_x - th / 2.0, chartArea.GetBottom() + 6.0);
+		}
+
+		for (int j = 0; j < yLinesCount; j++)
+		{
+			double normalizedLineY = static_cast<double>(j) / (yLinesCount - 1);
 			auto lineStartPoint = normalizedToChartArea.TransformPoint({ 0, normalizedLineY });
 			auto lineEndPoint = normalizedToChartArea.TransformPoint({ 1, normalizedLineY });
 
 			wxPoint2DDouble linePoints[] = { lineStartPoint, lineEndPoint };
 			gc->StrokeLines(2, linePoints);
-
+			
 			double valueAtLineY = normalizedToValue.TransformPoint({ 0, normalizedLineY }).m_y;
 
 			auto text = wxString::Format("%.2f", valueAtLineY);
@@ -180,6 +180,14 @@ void FilterCalc::OnPaintSignal(wxPaintEvent& evt)
 			gc->GetTextExtent(text, &tw, &th);
 			gc->DrawText(text, chartArea.GetLeft() - labelsToChartAreaMargin - tw, lineStartPoint.m_y - th / 2.0);
 		}
+
+		wxPoint2DDouble* testSignal = new wxPoint2DDouble[sample_freq];
+		wxPoint2DDouble* filteredSignal = new wxPoint2DDouble[sample_freq];
+
+		double dt, y;
+		std::vector<double> t;
+		std::vector<double> yy;
+		std::vector<double> y_filtered(sample_freq);
 
 		for (int i = 0; i < sample_freq; i++)
 		{
@@ -243,5 +251,5 @@ std::tuple<int, double, double> FilterCalc::CalSegment(double origLow, double or
 		}
 	}
 
-	return std::make_tuple(10, origLow, origHigh);
+	return std::make_tuple(6, origLow, origHigh);
 }

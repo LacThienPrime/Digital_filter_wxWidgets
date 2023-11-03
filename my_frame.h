@@ -11,7 +11,6 @@ class MyFrame : public MyFrameUI
 {
 public:
 	MyFrame();
-	//virtual ~MyFrame();
 
 private:
     void OnClose(wxCloseEvent& e);

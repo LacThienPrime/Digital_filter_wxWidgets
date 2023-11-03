@@ -19,7 +19,6 @@ public:
         int sample, std::vector<double> ac, std::vector<double> bc);
 
     std::string title;
-    double minX, maxX;
     std::vector<double> a;
     std::vector<double> b;
     
