@@ -1,6 +1,5 @@
 #include <wx/graphics.h>
 #include <wx/dcbuffer.h>
-#include <wx/list.h>
 
 #include <thread>
 #include <vector>
@@ -105,7 +104,7 @@ void FilterCalc::OnPaintSignal(wxPaintEvent& evt)
 		const double marginBottom = fullArea.GetSize().GetHeight() / 15.0;
 		double labelsToChartAreaMargin = this->FromDIP(10);
 
-		wxRect2DDouble chartArea = fullArea;
+		chartArea = fullArea;
 		chartArea.Inset(marginX, marginTop, marginX + 10.0, marginBottom + 30.0);
 
 		gc->DrawText(this->title, (fullArea.GetSize().GetWidth() - tw) / 2.0, (marginTop - th) / 2.0);
@@ -144,29 +143,13 @@ void FilterCalc::OnPaintSignal(wxPaintEvent& evt)
 		
 		for (int i = 0; i < 11; i++)
 		{
-			/*
-			if (i == 0 || i == 10)
-			{
-				wxColour barColor(51, 204, 102);
-				wxColour clipColor(255, 255, 0);
-				wxPen gridPen(barColor);
-				wxDash dashes;
-				dashes << 2 << 2;
-				gridPen.SetDashes(2, &dashes);
-				//gc->SetPen(gridPen);
-				gc->SetPen(barColor);
+			if (i == 0 || i == 10) {
+				barColor = wxColour(0, 0, 0);
+			} 
+			else {
+				barColor = wxColour(51, 204, 102);
 			}
-			else 
-			{
-				wxColour barColor(255, 255, 0);
-				wxColour clipColor(51, 204, 102);
-				wxPen gridPen(barColor);
-				wxDash dashes;
-				dashes << 2 << 2;
-				gridPen.SetDashes(2, &dashes);
-				//gc->SetPen(gridPen);
-				gc->SetPen(barColor);
-			}*/
+			gc->SetPen(barColor);
 			
 			double normalizedLineX = static_cast<double>(i) / 10;
 			auto startPoint = normalizedToChartArea.TransformPoint({ normalizedLineX, 0 });
@@ -188,6 +171,14 @@ void FilterCalc::OnPaintSignal(wxPaintEvent& evt)
 
 		for (int j = 0; j < yLinesCount; j++)
 		{
+			if (j == 0 || j == 6) {
+				barColor = wxColour(0, 0, 0);
+			}
+			else {
+				barColor = wxColour(51, 204, 102);
+			}
+			gc->SetPen(barColor);
+
 			double normalizedLineY = static_cast<double>(j) / (yLinesCount - 1);
 			auto lineStartPoint = normalizedToChartArea.TransformPoint({ 0, normalizedLineY });
 			auto lineEndPoint = normalizedToChartArea.TransformPoint({ 1, normalizedLineY });
