@@ -1,6 +1,6 @@
-#include <wx/settings.h>
 #include <wx/graphics.h>
 #include <wx/dcbuffer.h>
+#include <wx/list.h>
 
 #include <thread>
 #include <vector>
@@ -52,6 +52,7 @@ wxThread::ExitCode FilterCalc::Entry()
 	}
 
 	wxThreadEvent* eve = new wxThreadEvent(wxEVT_SORTINGTHREAD_COMPLETED);
+	this->Bind(wxEVT_PAINT, &FilterCalc::OnPaintSignal, this);
 	wxQueueEvent(this, eve);
 
 	return nullptr;
@@ -90,7 +91,7 @@ void FilterCalc::OnPaintSignal(wxPaintEvent& evt)
 		wxFont titleFont = wxFont(wxNORMAL_FONT->GetPointSize() * 2.0,
 			wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD);
 
-		gc->SetFont(titleFont, wxSystemSettings::GetAppearance().IsDark() ? *wxWHITE : *wxBLACK);
+		gc->SetFont(titleFont, *wxBLACK);
 
 		double tw, th;
 		gc->GetTextExtent(this->title, &tw, &th);
@@ -114,7 +115,7 @@ void FilterCalc::OnPaintSignal(wxPaintEvent& evt)
 		normalizedToChartArea.Scale(chartArea.m_width, chartArea.m_height);
 
 		gc->SetPen(wxPen(wxColor(128, 128, 128)));
-		gc->SetFont(*wxNORMAL_FONT, wxSystemSettings::GetAppearance().IsDark() ? *wxWHITE : *wxBLACK);
+		gc->SetFont(*wxNORMAL_FONT, *wxBLACK);
 
 		double lowValue = -3.0;
 		double highValue = 3.0;
@@ -143,6 +144,30 @@ void FilterCalc::OnPaintSignal(wxPaintEvent& evt)
 		
 		for (int i = 0; i < 11; i++)
 		{
+			/*
+			if (i == 0 || i == 10)
+			{
+				wxColour barColor(51, 204, 102);
+				wxColour clipColor(255, 255, 0);
+				wxPen gridPen(barColor);
+				wxDash dashes;
+				dashes << 2 << 2;
+				gridPen.SetDashes(2, &dashes);
+				//gc->SetPen(gridPen);
+				gc->SetPen(barColor);
+			}
+			else 
+			{
+				wxColour barColor(255, 255, 0);
+				wxColour clipColor(51, 204, 102);
+				wxPen gridPen(barColor);
+				wxDash dashes;
+				dashes << 2 << 2;
+				gridPen.SetDashes(2, &dashes);
+				//gc->SetPen(gridPen);
+				gc->SetPen(barColor);
+			}*/
+			
 			double normalizedLineX = static_cast<double>(i) / 10;
 			auto startPoint = normalizedToChartArea.TransformPoint({ normalizedLineX, 0 });
 			auto endPoint = normalizedToChartArea.TransformPoint({ normalizedLineX, 1 });
