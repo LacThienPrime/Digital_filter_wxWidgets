@@ -1,6 +1,7 @@
 #pragma once
 
 #include <wx/wx.h>
+#include <wx/list.h>
 
 #include <cmath>
 #include <tuple>
@@ -28,10 +29,26 @@ public:
 private:    
     std::tuple<int, double, double> CalSegment(double low, double high);
 
+    void mousePressEvent(wxMouseEvent* event);
+
+    wxColour barColor;
+
     bool processing{ false };
     virtual wxThread::ExitCode Entry();
 
     void OnThreadUpdate(wxThreadEvent&);
     void OnThreadCompletion(wxThreadEvent&);
     void OnThreadCancel(wxThreadEvent&);
+
+    wxRect2DDouble chartArea;
+
+    struct Bar
+    {
+        Bar() : value(0.0), clipped(false) { }
+        double value;
+        bool clipped;
+    };
+
+    std::vector<Bar> bars;
+    int barSelected;
 };

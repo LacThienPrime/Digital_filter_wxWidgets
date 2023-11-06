@@ -162,6 +162,9 @@
     <ClInclude Include="my_frame.h" />
     <ClInclude Include="my_frame_UI.h" />
   </ItemGroup>
+  <ItemGroup>
+    <Image Include="1894488.bmp" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

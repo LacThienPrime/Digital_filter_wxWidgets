@@ -1,4 +1,3 @@
-#include <wx/settings.h>
 #include <wx/graphics.h>
 #include <wx/dcbuffer.h>
 
@@ -52,6 +51,7 @@ wxThread::ExitCode FilterCalc::Entry()
 	}
 
 	wxThreadEvent* eve = new wxThreadEvent(wxEVT_SORTINGTHREAD_COMPLETED);
+	this->Bind(wxEVT_PAINT, &FilterCalc::OnPaintSignal, this);
 	wxQueueEvent(this, eve);
 
 	return nullptr;
@@ -90,7 +90,7 @@ void FilterCalc::OnPaintSignal(wxPaintEvent& evt)
 		wxFont titleFont = wxFont(wxNORMAL_FONT->GetPointSize() * 2.0,
 			wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD);
 
-		gc->SetFont(titleFont, wxSystemSettings::GetAppearance().IsDark() ? *wxWHITE : *wxBLACK);
+		gc->SetFont(titleFont, *wxBLACK);
 
 		double tw, th;
 		gc->GetTextExtent(this->title, &tw, &th);
@@ -104,7 +104,7 @@ void FilterCalc::OnPaintSignal(wxPaintEvent& evt)
 		const double marginBottom = fullArea.GetSize().GetHeight() / 15.0;
 		double labelsToChartAreaMargin = this->FromDIP(10);
 
-		wxRect2DDouble chartArea = fullArea;
+		chartArea = fullArea;
 		chartArea.Inset(marginX, marginTop, marginX + 10.0, marginBottom + 30.0);
 
 		gc->DrawText(this->title, (fullArea.GetSize().GetWidth() - tw) / 2.0, (marginTop - th) / 2.0);
@@ -114,7 +114,7 @@ void FilterCalc::OnPaintSignal(wxPaintEvent& evt)
 		normalizedToChartArea.Scale(chartArea.m_width, chartArea.m_height);
 
 		gc->SetPen(wxPen(wxColor(128, 128, 128)));
-		gc->SetFont(*wxNORMAL_FONT, wxSystemSettings::GetAppearance().IsDark() ? *wxWHITE : *wxBLACK);
+		gc->SetFont(*wxNORMAL_FONT, *wxBLACK);
 
 		double lowValue = -3.0;
 		double highValue = 3.0;
@@ -143,6 +143,14 @@ void FilterCalc::OnPaintSignal(wxPaintEvent& evt)
 		
 		for (int i = 0; i < 11; i++)
 		{
+			if (i == 0 || i == 10) {
+				barColor = wxColour(0, 0, 0);
+			} 
+			else {
+				barColor = wxColour(51, 204, 102);
+			}
+			gc->SetPen(barColor);
+			
 			double normalizedLineX = static_cast<double>(i) / 10;
 			auto startPoint = normalizedToChartArea.TransformPoint({ normalizedLineX, 0 });
 			auto endPoint = normalizedToChartArea.TransformPoint({ normalizedLineX, 1 });
@@ -163,6 +171,14 @@ void FilterCalc::OnPaintSignal(wxPaintEvent& evt)
 
 		for (int j = 0; j < yLinesCount; j++)
 		{
+			if (j == 0 || j == 6) {
+				barColor = wxColour(0, 0, 0);
+			}
+			else {
+				barColor = wxColour(51, 204, 102);
+			}
+			gc->SetPen(barColor);
+
 			double normalizedLineY = static_cast<double>(j) / (yLinesCount - 1);
 			auto lineStartPoint = normalizedToChartArea.TransformPoint({ 0, normalizedLineY });
 			auto lineEndPoint = normalizedToChartArea.TransformPoint({ 1, normalizedLineY });

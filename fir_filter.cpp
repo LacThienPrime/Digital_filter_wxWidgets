@@ -63,6 +63,10 @@ std::vector<double> FIRfilter::ComputeResponses
     return impulseResponse;
 }
 
+
+/*
+*  https://en.wikipedia.org/wiki/Window_function#A_list_of_window_functions
+*/
 std::vector<double> FIRfilter::ComputeWindow(int order)
 {
     std::vector<double> window(order);

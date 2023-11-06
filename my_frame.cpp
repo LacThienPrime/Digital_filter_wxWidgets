@@ -20,10 +20,20 @@ MyFrame::MyFrame() : MyFrameUI(nullptr, wxID_ANY, "Digital Filter C++", wxDefaul
     dftSignal->title = "DFT";
 
     this->Bind(wxEVT_CLOSE_WINDOW, &MyFrame::OnClose, this);
+
+    DefaultPlot();
 }
 
 void MyFrame::OnStartIIRClicked(wxCommandEvent& e)
 {     
+    testSignal->Refresh();
+    dftSignal->Refresh();
+
+    DefaultPlot();
+}
+
+void MyFrame::DefaultPlot()
+{
     testSignal->Refresh();
     dftSignal->Refresh();
 

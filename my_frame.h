@@ -17,6 +17,8 @@ private:
     void OnStartIIRClicked(wxCommandEvent& e);
     void SelectResponse();
 
+    void DefaultPlot();
+
     int sample_freq;
     int pass_freq;
     int stop_freq;
