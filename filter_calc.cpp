@@ -12,11 +12,20 @@ wxDEFINE_EVENT(wxEVT_SORTINGTHREAD_COMPLETED, wxThreadEvent);
 wxDEFINE_EVENT(wxEVT_SORTINGTHREAD_CANCELLED, wxThreadEvent);
 wxDEFINE_EVENT(wxEVT_SORTINGTHREAD_UPDATED, wxThreadEvent);
 
-FilterCalc::FilterCalc(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size)
+FilterCalc::FilterCalc(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, bool IIR)
 	: wxWindow(parent, id, pos, size, wxFULL_REPAINT_ON_RESIZE)
 {
 	this->SetBackgroundStyle(wxBG_STYLE_PAINT);
 
+	if (IIR)
+	{
+		this->Bind(wxEVT_PAINT, &FilterCalc::OnPaintIIR, this);
+	}
+	else
+	{
+		this->Bind(wxEVT_PAINT, &FilterCalc::OnPaintFIR, this);
+	}
+	
 	this->Bind(wxEVT_SORTINGTHREAD_UPDATED, &FilterCalc::OnThreadUpdate, this);
 	this->Bind(wxEVT_SORTINGTHREAD_COMPLETED, &FilterCalc::OnThreadCompletion, this);
 	this->Bind(wxEVT_SORTINGTHREAD_CANCELLED, &FilterCalc::OnThreadCancel, this);
@@ -51,7 +60,8 @@ wxThread::ExitCode FilterCalc::Entry()
 	}
 
 	wxThreadEvent* eve = new wxThreadEvent(wxEVT_SORTINGTHREAD_COMPLETED);
-	this->Bind(wxEVT_PAINT, &FilterCalc::OnPaintSignal, this);
+	this->Bind(wxEVT_PAINT, &FilterCalc::OnPaintIIR, this);
+	this->Bind(wxEVT_PAINT, &FilterCalc::OnPaintFIR, this);
 	wxQueueEvent(this, eve);
 
 	return nullptr;
@@ -78,7 +88,7 @@ void FilterCalc::OnThreadCancel(wxThreadEvent& e)
 	this->processing = false;
 }
 
-void FilterCalc::OnPaintSignal(wxPaintEvent& evt)
+void FilterCalc::OnPaintSignal(wxPaintEvent& evt, bool isIIR)
 {
 	wxAutoBufferedPaintDC dc(this);
 	dc.Clear();
@@ -195,10 +205,9 @@ void FilterCalc::OnPaintSignal(wxPaintEvent& evt)
 			gc->GetTextExtent(text, &tw, &th);
 			gc->DrawText(text, chartArea.GetLeft() - labelsToChartAreaMargin - tw, lineStartPoint.m_y - th / 2.0);
 		}
-
+		
 		wxPoint2DDouble* testSignal = new wxPoint2DDouble[sample];
-		wxPoint2DDouble* filteredSignal = new wxPoint2DDouble[sample];
-
+		
 		double dt, y;
 		std::vector<double> t;
 		std::vector<double> yy;
@@ -215,32 +224,65 @@ void FilterCalc::OnPaintSignal(wxPaintEvent& evt)
 			testSignal[i] = valueToChartArea.TransformPoint({ dt, y });
 		}
 
-		for (int j = 0; j < sample; j++)
-		{
-			if (j < 3)
-			{
-				y_filtered[j] = 0.0;
-			}
-			else
-			{
-				y_filtered[j] = a[1] * y_filtered[j - 1] + a[2] * y_filtered[j - 2] + b[0] * yy[j] + b[1] * yy[j - 1] + b[2] * yy[j - 2];
-			}
-
-			filteredSignal[j] = valueToChartArea.TransformPoint({ t[j], y_filtered[j] });
-		}
-
-		for (int j = 0; j < sample; j++)
-		{
-			filteredSignal[j] = valueToChartArea.TransformPoint({ t[j], y_filtered[j] });
-		}
-
 		gc->SetPen(wxPen(*wxBLUE, 1));
 		gc->StrokeLines(sample, testSignal);
-		gc->SetPen(wxPen(*wxRED, 1));
-		gc->StrokeLines(sample, filteredSignal);
+
+		if (isIIR)
+		{
+			wxPoint2DDouble* filteredSignal = new wxPoint2DDouble[sample];
+
+			for (int j = 0; j < sample; j++)
+			{
+				if (j < 3)
+				{
+					y_filtered[j] = 0.0;
+				}
+				else
+				{
+					y_filtered[j] = a[1] * y_filtered[j - 1] + a[2] * y_filtered[j - 2] + b[0] * yy[j] + b[1] * yy[j - 1] + b[2] * yy[j - 2];
+				}
+
+				filteredSignal[j] = valueToChartArea.TransformPoint({ t[j], y_filtered[j] });
+			}
+
+			gc->SetPen(wxPen(*wxRED, 1));
+			gc->StrokeLines(sample, filteredSignal);
+
+			delete[] filteredSignal;
+		}
+		else
+		{
+			wxPoint2DDouble* firSignal = new wxPoint2DDouble[sample];
+
+			for (int i = 0; i < sample; i++)
+			{
+				y_filtered[i] = 0.0;
+
+				for (int j = 0; j < order; j++)
+				{
+					if (i + j == sample)
+					{
+						break;
+					}
+
+					y_filtered[i] += yy[i + j] * coef[j];
+				}
+
+				firSignal[i] = valueToChartArea.TransformPoint({ t[i], y_filtered[i] });
+			}
+
+			for (int j = 0; j < sample; j++)
+			{
+				firSignal[j] = valueToChartArea.TransformPoint({ t[j], y_filtered[j] });
+			}
+
+			gc->SetPen(wxPen(*wxRED, 1));
+			gc->StrokeLines(sample, firSignal);
+
+			delete[] firSignal;
+		}
 
 		delete[] testSignal;
-		delete[] filteredSignal;
 		delete gc;
 	}
 }
@@ -269,9 +311,26 @@ std::tuple<int, double, double> FilterCalc::CalSegment(double origLow, double or
 	return std::make_tuple(6, origLow, origHigh);
 }
 
-void FilterCalc::UpdateValues(int s, std::vector<double> &ac, std::vector<double> &bc)
+void FilterCalc::UpdateIIRValues(int s, std::vector<double> &ac, std::vector<double> &bc)
 {
 	sample = s;
 	a = ac;
 	b = bc;
+}
+
+void FilterCalc::UpdateFIRValues(int s, int o, std::vector<double>& co)
+{
+	sample = s;
+	order = o;
+	coef = co;
+}
+
+void FilterCalc::OnPaintIIR(wxPaintEvent& evt)
+{
+	OnPaintSignal(evt, true);
+}
+
+void FilterCalc::OnPaintFIR(wxPaintEvent& evt)
+{
+	OnPaintSignal(evt, false);
 }

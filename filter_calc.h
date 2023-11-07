@@ -16,39 +16,30 @@ wxDECLARE_EVENT(wxEVT_SORTINGTHREAD_UPDATED, wxThreadEvent);
 class FilterCalc : public wxWindow, public wxThreadHelper
 {
 public:
-    FilterCalc(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size);
+    FilterCalc(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, bool IIR);
 
     int sample;
+    int order;
     std::string title;
     std::vector<double> a;
     std::vector<double> b;
+    std::vector<double> coef;
 
-    void OnPaintSignal(wxPaintEvent& evt);
-    void UpdateValues(int s, std::vector<double> &ac, std::vector<double> &bc);
+    void OnPaintSignal(wxPaintEvent& evt, bool isIIR);
+    void OnPaintIIR(wxPaintEvent& evt);
+    void OnPaintFIR(wxPaintEvent& evt);
+    void UpdateIIRValues(int s, std::vector<double>& ac, std::vector<double>& bc);
+    void UpdateFIRValues(int s, int o, std::vector<double>& co);
 
 private:    
     std::tuple<int, double, double> CalSegment(double low, double high);
 
-    void mousePressEvent(wxMouseEvent* event);
-
     wxColour barColor;
+    wxRect2DDouble chartArea;
 
     bool processing{ false };
     virtual wxThread::ExitCode Entry();
-
     void OnThreadUpdate(wxThreadEvent&);
     void OnThreadCompletion(wxThreadEvent&);
     void OnThreadCancel(wxThreadEvent&);
-
-    wxRect2DDouble chartArea;
-
-    struct Bar
-    {
-        Bar() : value(0.0), clipped(false) { }
-        double value;
-        bool clipped;
-    };
-
-    std::vector<Bar> bars;
-    int barSelected;
 };

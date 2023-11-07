@@ -2,18 +2,12 @@
 
 #include <wx/wx.h>
 
-#include <vector>
-#include <thread>
 #include <tuple>
 #include <vector>
-#include <thread>
-#include <chrono>
-#include <complex>
-#include <stdint.h>
 #include <math.h>
 #include <cmath>
 
-class FIRfilter : public wxWindow
+class FIRfilter
 {
 public:
     enum class WindowType

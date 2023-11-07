@@ -11,22 +11,39 @@ class MyFrame : public MyFrameUI
 {
 public:
 	MyFrame();
+    ~MyFrame();
 
 private:
     void OnClose(wxCloseEvent& e);
     void OnStartIIRClicked(wxCommandEvent& e);
+    void OnStartFIRClicked(wxCommandEvent& e);
+    void GetInputValue();
     void SelectResponse();
+    
+    FilterCalc* testSignal;
+    FilterCalc* dftSignal;
+    FIRfilter* fir;
 
-    void DefaultPlot();
-
+    /*
+    *  IIR parameters
+    */
     int sample_freq;
     int pass_freq;
     int stop_freq;
 
     std::vector<double> a;
     std::vector<double> b;
-   
-    FilterCalc* testSignal;
-    FilterCalc* dftSignal;
+
+    /*
+    *  IIR parameters
+    */
+    int order;
+    int shift_sample;
+    int low_cutoff_freq;
+    int high_cutoff_freq;
+
+    std::vector<double> responses;
+    std::vector<double> window;
+    std::vector<double> window_responses;
 };
 
