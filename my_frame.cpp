@@ -74,7 +74,20 @@ void MyFrame::OnStartIIRClicked(wxCommandEvent& e)
     SelectResponse();
 
     testSignal->UpdateIIRValues(sample_freq, a, b);
-    testSignal->Bind(wxEVT_PAINT, &FilterCalc::OnPaintIIR, testSignal);
+
+    std::thread signalThread([this]()
+        {
+            testSignal->Refresh();
+
+            std::thread guiThread([this]()
+                {
+                    testSignal->Bind(wxEVT_PAINT, &FilterCalc::OnPaintIIR, testSignal);
+                });
+
+            guiThread.detach();
+        });
+
+    signalThread.detach();
 }
 
 void MyFrame::OnStartFIRClicked(wxCommandEvent& e)
@@ -120,9 +133,6 @@ void MyFrame::OnClose(wxCloseEvent& e)
 
 void MyFrame::GetInputValue()
 {
-    sample_freq = atoi((m_textCtrl_sample->GetValue()).c_str());
-    pass_freq = atoi((m_textCtrl_pass_freq->GetValue()).c_str());
-    stop_freq = atoi((m_textCtrl_stop_freq->GetValue()).c_str());
     sample_freq = atoi((m_textCtrl_sample->GetValue()).c_str());
     pass_freq = atoi((m_textCtrl_pass_freq->GetValue()).c_str());
     stop_freq = atoi((m_textCtrl_stop_freq->GetValue()).c_str());

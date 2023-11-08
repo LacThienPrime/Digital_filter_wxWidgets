@@ -8,9 +8,6 @@
 
 #include "filter_calc.h"
 
-wxDEFINE_EVENT(wxEVT_SORTINGTHREAD_COMPLETED, wxThreadEvent);
-wxDEFINE_EVENT(wxEVT_SORTINGTHREAD_CANCELLED, wxThreadEvent);
-wxDEFINE_EVENT(wxEVT_SORTINGTHREAD_UPDATED, wxThreadEvent);
 
 FilterCalc::FilterCalc(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, bool IIR)
 	: wxWindow(parent, id, pos, size, wxFULL_REPAINT_ON_RESIZE)
@@ -25,67 +22,6 @@ FilterCalc::FilterCalc(wxWindow* parent, wxWindowID id, const wxPoint& pos, cons
 	{
 		this->Bind(wxEVT_PAINT, &FilterCalc::OnPaintFIR, this);
 	}
-	
-	this->Bind(wxEVT_SORTINGTHREAD_UPDATED, &FilterCalc::OnThreadUpdate, this);
-	this->Bind(wxEVT_SORTINGTHREAD_COMPLETED, &FilterCalc::OnThreadCompletion, this);
-	this->Bind(wxEVT_SORTINGTHREAD_CANCELLED, &FilterCalc::OnThreadCancel, this);
-
-	if (!this->processing)
-	{
-		this->processing = true;
-
-		if (CreateThread(wxTHREAD_JOINABLE) != wxTHREAD_NO_ERROR || GetThread()->Run() != wxTHREAD_NO_ERROR)
-		{
-			this->processing = false;
-		}
-		else
-		{
-
-		}
-
-		this->Layout();
-	}
-}
-
-wxThread::ExitCode FilterCalc::Entry()
-{
-	wxThreadEvent* e = new wxThreadEvent(wxEVT_SORTINGTHREAD_UPDATED);
-	wxQueueEvent(this, e);
-
-	if (wxThread::This()->TestDestroy())
-	{
-		wxThreadEvent* ev = new wxThreadEvent(wxEVT_SORTINGTHREAD_CANCELLED);
-		wxQueueEvent(this, ev);
-		return nullptr;
-	}
-
-	wxThreadEvent* eve = new wxThreadEvent(wxEVT_SORTINGTHREAD_COMPLETED);
-	this->Bind(wxEVT_PAINT, &FilterCalc::OnPaintIIR, this);
-	this->Bind(wxEVT_PAINT, &FilterCalc::OnPaintFIR, this);
-	wxQueueEvent(this, eve);
-
-	return nullptr;
-}
-
-void FilterCalc::OnThreadUpdate(wxThreadEvent& e)
-{
-
-}
-
-void FilterCalc::OnThreadCompletion(wxThreadEvent& e)
-{
-	this->Layout();
-
-	GetThread()->Wait();
-
-	this->processing = false;
-}
-
-void FilterCalc::OnThreadCancel(wxThreadEvent& e)
-{
-	this->Layout();
-
-	this->processing = false;
 }
 
 void FilterCalc::OnPaintSignal(wxPaintEvent& evt, bool isIIR)
@@ -113,7 +49,7 @@ void FilterCalc::OnPaintSignal(wxPaintEvent& evt, bool isIIR)
 		const double marginTop = std::max(fullArea.GetSize().GetHeight() / 15.0, titleTopBottomMinimumMargin * 2.0 + 20.0);
 		const double marginBottom = fullArea.GetSize().GetHeight() / 15.0;
 		double labelsToChartAreaMargin = this->FromDIP(10);
-
+		wxRect rect();
 		chartArea = fullArea;
 		chartArea.Inset(marginX, marginTop, marginX + 10.0, marginBottom + 30.0);
 
@@ -162,6 +98,7 @@ void FilterCalc::OnPaintSignal(wxPaintEvent& evt, bool isIIR)
 			gc->SetPen(barColor);
 			
 			double normalizedLineX = static_cast<double>(i) / 10;
+
 			auto startPoint = normalizedToChartArea.TransformPoint({ normalizedLineX, 0 });
 			auto endPoint = normalizedToChartArea.TransformPoint({ normalizedLineX, 1 });
 
@@ -207,82 +144,73 @@ void FilterCalc::OnPaintSignal(wxPaintEvent& evt, bool isIIR)
 		}
 		
 		wxPoint2DDouble* testSignal = new wxPoint2DDouble[sample];
-		
+		wxPoint2DDouble* filteredSignal = new wxPoint2DDouble[sample];
+
 		double dt, y;
 		std::vector<double> t;
 		std::vector<double> yy;
 		std::vector<double> y_filtered(sample);
 
-		for (int i = 0; i < sample; i++)
-		{
-			dt = static_cast<double>(i) / sample;
-			t.push_back(dt);
+		std::thread processingThread([&]()
+			{
+				for (int i = 0; i < sample; i++)
+				{
+					dt = static_cast<double>(i) / sample;
+					t.push_back(dt);
 
-			y = sin(2 * M_PI * 5.0 * dt) + 0.6 * sin(2 * M_PI * 50.0 * dt) + 0.8 * sin(2 * M_PI * 80.0 * dt);
-			yy.push_back(y);
+					y = sin(2 * M_PI * 5.0 * dt) + 0.6 * sin(2 * M_PI * 50.0 * dt) + 0.8 * sin(2 * M_PI * 80.0 * dt);
+					yy.push_back(y);
 
-			testSignal[i] = valueToChartArea.TransformPoint({ dt, y });
-		}
+					testSignal[i] = valueToChartArea.TransformPoint({ dt, y });
+				}
+
+				if (isIIR)
+				{
+					for (int j = 0; j < sample; j++)
+					{
+						if (j < 3)
+						{
+							y_filtered[j] = 0.0;
+						}
+						else
+						{
+							y_filtered[j] = a[1] * y_filtered[j - 1] + a[2] * y_filtered[j - 2] + b[0] * yy[j] + b[1] * yy[j - 1] + b[2] * yy[j - 2];
+						}
+
+						filteredSignal[j] = valueToChartArea.TransformPoint({ t[j], y_filtered[j] });
+					}
+				}
+				else
+				{
+					for (int i = 0; i < sample; i++)
+					{
+						y_filtered[i] = 0.0;
+
+						for (int j = 0; j < order; j++)
+						{
+							if (i + j == sample)
+							{
+								break;
+							}
+
+							y_filtered[i] += yy[i + j] * coef[j];
+						}
+
+						filteredSignal[i] = valueToChartArea.TransformPoint({ t[i], y_filtered[i] });
+					}
+				}
+			});
+
+		processingThread.join();
 
 		gc->SetPen(wxPen(*wxBLUE, 1));
 		gc->StrokeLines(sample, testSignal);
 
-		if (isIIR)
-		{
-			wxPoint2DDouble* filteredSignal = new wxPoint2DDouble[sample];
-
-			for (int j = 0; j < sample; j++)
-			{
-				if (j < 3)
-				{
-					y_filtered[j] = 0.0;
-				}
-				else
-				{
-					y_filtered[j] = a[1] * y_filtered[j - 1] + a[2] * y_filtered[j - 2] + b[0] * yy[j] + b[1] * yy[j - 1] + b[2] * yy[j - 2];
-				}
-
-				filteredSignal[j] = valueToChartArea.TransformPoint({ t[j], y_filtered[j] });
-			}
-
-			gc->SetPen(wxPen(*wxRED, 1));
-			gc->StrokeLines(sample, filteredSignal);
-
-			delete[] filteredSignal;
-		}
-		else
-		{
-			wxPoint2DDouble* firSignal = new wxPoint2DDouble[sample];
-
-			for (int i = 0; i < sample; i++)
-			{
-				y_filtered[i] = 0.0;
-
-				for (int j = 0; j < order; j++)
-				{
-					if (i + j == sample)
-					{
-						break;
-					}
-
-					y_filtered[i] += yy[i + j] * coef[j];
-				}
-
-				firSignal[i] = valueToChartArea.TransformPoint({ t[i], y_filtered[i] });
-			}
-
-			for (int j = 0; j < sample; j++)
-			{
-				firSignal[j] = valueToChartArea.TransformPoint({ t[j], y_filtered[j] });
-			}
-
-			gc->SetPen(wxPen(*wxRED, 1));
-			gc->StrokeLines(sample, firSignal);
-
-			delete[] firSignal;
-		}
-
+		gc->SetPen(wxPen(*wxRED, 1));
+		gc->StrokeLines(sample, filteredSignal);
+		
 		delete[] testSignal;
+		delete[] filteredSignal;	
 		delete gc;
 	}
 }

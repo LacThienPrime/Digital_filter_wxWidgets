@@ -1,19 +1,15 @@
 #pragma once
 
 #include <wx/wx.h>
-#include <wx/list.h>
 
+#include <list>
 #include <cmath>
 #include <tuple>
 #include <vector>
 #include <complex>
 #include <string>
 
-wxDECLARE_EVENT(wxEVT_SORTINGTHREAD_COMPLETED, wxThreadEvent);
-wxDECLARE_EVENT(wxEVT_SORTINGTHREAD_CANCELLED, wxThreadEvent);
-wxDECLARE_EVENT(wxEVT_SORTINGTHREAD_UPDATED, wxThreadEvent);
-
-class FilterCalc : public wxWindow, public wxThreadHelper
+class FilterCalc : public wxWindow
 {
 public:
     FilterCalc(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, bool IIR);
@@ -33,13 +29,7 @@ public:
 
 private:    
     std::tuple<int, double, double> CalSegment(double low, double high);
-
+    
     wxColour barColor;
     wxRect2DDouble chartArea;
-
-    bool processing{ false };
-    virtual wxThread::ExitCode Entry();
-    void OnThreadUpdate(wxThreadEvent&);
-    void OnThreadCompletion(wxThreadEvent&);
-    void OnThreadCancel(wxThreadEvent&);
 };

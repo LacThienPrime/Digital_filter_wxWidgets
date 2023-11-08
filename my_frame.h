@@ -2,6 +2,8 @@
 
 #include <wx/wx.h>
 
+#include <thread>
+
 #include "coef_strategy.h"
 #include "fir_filter.h"
 #include "filter_calc.h"
